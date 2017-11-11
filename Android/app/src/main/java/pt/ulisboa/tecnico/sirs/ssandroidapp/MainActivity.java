@@ -27,4 +27,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, QRScannerActivity.class);
         startActivity(intent);
     }
+
+    public void changeActivity2BluetoothPair(View view) {
+        Intent intent = new Intent(this, BluetoothActivity.class);
+        startActivity(intent);
+    }
 }

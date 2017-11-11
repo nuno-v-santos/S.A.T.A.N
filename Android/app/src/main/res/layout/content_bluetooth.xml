@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="pt.ulisboa.tecnico.sirs.ssandroidapp.BluetoothActivity"
+    tools:showIn="@layout/activity_bluetooth">
+
+    <TextView
+        android:id="@+id/textbox1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scan for devices" />
+
+    <ToggleButton
+        android:id="@+id/scan_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOff="Scan Off"
+        android:textOn="Scan On" />
+
+    <ListView
+        android:id="@+id/devices_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>
