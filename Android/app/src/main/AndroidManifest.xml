@@ -3,6 +3,8 @@
     package="pt.ulisboa.tecnico.sirs.ssandroidapp">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
         android:allowBackup="true"
@@ -19,6 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".QRScannerActivity"></activity>
+        <activity android:name=".BluetoothActivity"></activity>
     </application>
 
 </manifest>
