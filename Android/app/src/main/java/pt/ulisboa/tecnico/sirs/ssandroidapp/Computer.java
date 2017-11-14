@@ -1,22 +1,24 @@
 package pt.ulisboa.tecnico.sirs.ssandroidapp;
 
+import java.io.Serializable;
+
 /**
  * Created by Guilherme on 07/11/2017.
  */
 
-public class Computer {
-    private String id;
+public class Computer implements Serializable {
+    private String name = "BANANA"; // bluetooth name FIXME banana
     private String publicKey; // FIXME STRING?
 
-    public Computer(String id, String publicKey) {
-        this.id = id;
+    public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
     }
 
-    public String getId() {
-        return id;
+    public void setName(String name) {
+        this.name = name;
     }
 
+    public String getName() { return name; }
     public String getPublicKey() {
         return publicKey;
     }

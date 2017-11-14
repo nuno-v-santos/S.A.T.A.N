@@ -8,23 +8,14 @@
     tools:context="pt.ulisboa.tecnico.sirs.ssandroidapp.MainActivity">
 
     <Button
-        android:id="@+id/QRbutton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="changeActivity2QRScanner"
-        android:text="QR Scanner"
-        android:textIsSelectable="false"
-        tools:textAllCaps="false" />
-
-    <Button
-        android:id="@+id/BluetoothButton"
+        android:id="@+id/pairingButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="changeActivity2BluetoothPair"
-        android:text="Bluetooth pair" />
+        android:text="Pairing" />
 
     <TextView
-        android:id="@+id/publicKeyTV"
+        android:id="@+id/statusTV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"

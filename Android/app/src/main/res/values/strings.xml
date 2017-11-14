@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">SSAndroidApp</string>
-    <string name="title_activity_bluethoot">BluethootActivity</string>
+    <string name="qr_code_read_success_msg">QR successfully read!</string>
+    <string name="ClassNotFoundException_error_msg">Unable to retrieve current paired device.</string>
+    <string name="current_paired_computer_name_msg">Currently connected to: </string>
+    <string name="IOException_read_obj_error_msg">Pairing not yet done.</string>
+    <string name="IOException_write_obj_error_msg">Could not save Computer obj...</string>
 </resources>
