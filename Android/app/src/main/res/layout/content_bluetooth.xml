@@ -9,18 +9,11 @@
     tools:context="pt.ulisboa.tecnico.sirs.ssandroidapp.BluetoothActivity"
     tools:showIn="@layout/activity_bluetooth">
 
-    <TextView
-        android:id="@+id/textbox1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Scan for devices" />
-
-    <ToggleButton
+    <Switch
         android:id="@+id/scan_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textOff="Scan Off"
-        android:textOn="Scan On" />
+        android:text="Scan nearby devices    " />
 
     <ListView
         android:id="@+id/devices_list"
