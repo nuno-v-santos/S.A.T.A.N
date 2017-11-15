@@ -47,7 +47,6 @@ public class QRScannerActivity extends AppCompatActivity implements ZXingScanner
         setContentView(R.layout.activity_qrscanner); // change layout
         TextView tv = findViewById(R.id.qrMsgTV);
         qrMsg = result.getText();
-        // FIXME check if valid qr message
         tv.setText(qrMsg); // add qr message to text view
     }
 
@@ -63,9 +62,17 @@ public class QRScannerActivity extends AppCompatActivity implements ZXingScanner
     }
 
     public void changeActivityDone(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
+        try {
+            computer.setupPublicKey(qrMsg);
+        } catch (Exception e) { // invalid public key scanned, repeat
+            Toast.makeText(getApplicationContext(), R.string.qr_code_read_success_msg, Toast.LENGTH_LONG).show();
+            setContentView(zXingScannerView);
+            zXingScannerView.resumeCameraPreview(this);
+            zXingScannerView.startCamera();
+            return;
+        }
 
-        computer.setPublicKey(qrMsg);
+        Intent intent = new Intent(this, MainActivity.class);
 
         Bundle b = new Bundle();
         b.putSerializable(Constants.COMPUTER_OBJ, computer);
