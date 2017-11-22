@@ -15,14 +15,15 @@ import java.security.spec.X509EncodedKeySpec;
  */
 
 public class Computer implements Serializable {
-    private String name = "BANANA"; // bluetooth name FIXME banana
+    private String name = "default"; // bluetooth name
+    private String mac = "00:00:00:00:00:00";  //bluetooth mac
+    private PublicKey publicKey;
 
-    public void setupPublicKey(String publicKey) {
+    public void setupPublicKey(String pk) {
         try {
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.decode(publicKey.trim().getBytes(), Base64.DEFAULT));
-            FileOutputStream fos = new FileOutputStream("public.key");
-            fos.write(keySpec.getEncoded());
-            fos.close();
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.decode(pk.trim().getBytes(), Base64.DEFAULT));
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            publicKey = kf.generatePublic(keySpec);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -31,11 +32,16 @@ public class Computer implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+    public void setMac(String mac) {
+        this.mac = mac;
+    }
 
     public String getName() { return name; }
+    public String getMac() { return mac; }
 
     public PublicKey getPublicKey() {
-        PublicKey publicKey = null;
+        return publicKey;
+        /*PublicKey publicKey = null;
         try {
             File filePublicKey = new File("public.key");
             FileInputStream fis = new FileInputStream("public.key");
@@ -52,6 +58,6 @@ public class Computer implements Serializable {
             e.printStackTrace();
         }
 
-        return publicKey;
+        return publicKey;*/
     }
 }

@@ -18,18 +18,19 @@ import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
 public class BluetoothActivity extends AppCompatActivity {
 
-    ArrayList<BluetoothDevice> devices = new ArrayList<BluetoothDevice>();
     ArrayList<String> devices_description = new ArrayList<String>();
     ArrayAdapter<String> adapter;
-    BluetoothDevice chosen_device;
-    BluetoothSocket btSocket;
+    String chosen_name;
+    String chosen_mac;
     BluetoothAdapter mBluetoothAdapter;
 
     @Override
@@ -46,16 +47,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
         //if the device doesnt have bluetooth
         if (mBluetoothAdapter == null) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Not compatible")
-                    .setMessage("Your phone does not support Bluetooth")
-                    .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            System.exit(0);
-                        }
-                    })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
+            alert("Not compatible", "Your phone does not support Bluetooth");
         }
 
         int REQUEST_ENABLE_BT = 1;
@@ -67,6 +59,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
         //if the user doesnt enable the bluetooth
         if (REQUEST_ENABLE_BT == 0){
+            alert("Bluetooth not enabled", "Bluetooth needs to be enabled to continue pairing");
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
@@ -75,24 +68,21 @@ public class BluetoothActivity extends AppCompatActivity {
         Switch scan = (Switch) findViewById(R.id.scan_button);
         scan.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            if (isChecked) {
-                adapter.clear();
-                //add the already paired devices
-                for (BluetoothDevice device : mBluetoothAdapter.getBondedDevices()) {
-                    if (!devices.contains(device)) {
-                        devices.add(device);
+                IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+                if (isChecked) {
+                    adapter.clear();
+                    //add the already paired devices
+                    for (BluetoothDevice device : mBluetoothAdapter.getBondedDevices()) {
                         devices_description.add(device.getName() + " at " + device.getAddress());
                         adapter.notifyDataSetChanged();
                     }
+                    registerReceiver(mReceiver, filter);
+                    //find new devices
+                    mBluetoothAdapter.startDiscovery();
+                } else {
+                    unregisterReceiver(mReceiver);
+                    mBluetoothAdapter.cancelDiscovery();
                 }
-                registerReceiver(mReceiver, filter);
-                //find new devices
-                mBluetoothAdapter.startDiscovery();
-            } else {
-                unregisterReceiver(mReceiver);
-                mBluetoothAdapter.cancelDiscovery();
-            }
             }
         });
 
@@ -100,21 +90,21 @@ public class BluetoothActivity extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> adapter,View v, int position, long id){
+                //Stop discovery
+                unregisterReceiver(mReceiver);
+                mBluetoothAdapter.cancelDiscovery();
+                //get the clicked device
                 String clickedDevice = (String) adapter.getItemAtPosition(position);
-                for (BluetoothDevice d : devices){
-                    if (d.getName().equals(clickedDevice.split(" ")[0])) {
-                        chosen_device = d;
-                        break;
-                    }
-                }
-                boolean connected = connect();  //try to connect to chosen device
-                if (connected) {
-                    Intent intent = new Intent(getBaseContext(), QRScannerActivity.class);
-                    startActivity(intent);
-                } else {
-                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                    startActivity(intent);
-                }
+                chosen_name = clickedDevice.split(" ")[0];
+                chosen_mac = clickedDevice.split(" ")[2];
+                //create, fill, and serialize Computer
+                Computer pc = new Computer();
+                pc.setName(chosen_name);
+                pc.setMac(chosen_mac);
+
+                Intent intent = new Intent(getBaseContext(), QRScannerActivity.class);
+                intent.putExtra(Constants.COMPUTER_OBJ, pc);
+                startActivity(intent);
             }
         });
 
@@ -128,54 +118,25 @@ public class BluetoothActivity extends AppCompatActivity {
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
             // Get the BluetoothDevice object from the Intent
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            if (!devices.contains(device)) {
-                devices.add(device);
-                devices_description.add(device.getName() + " at " + device.getAddress());
+            String new_device = device.getName() + " at " + device.getAddress();
+            if (!devices_description.contains(new_device)) {
+                devices_description.add(new_device);
                 adapter.notifyDataSetChanged();
             }
         }
         }
     };
 
-    public boolean connect(){
-        try {
-            //create socket
-            btSocket = chosen_device.createRfcommSocketToServiceRecord(UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee"));
-        } catch (IOException e) {
-            Log.d("Socket_Creation","Could not create socket.");
-            return false;
-        }
-
-        try {
-            btSocket.connect();
-        } catch(IOException e) {
-            Log.d("Connection_Failed","Could not connect to device.");
-            try {
-                btSocket.close();
-                return false;
-            } catch(IOException close) {
-                Log.d("Failed_Close", "Could not close connection");
-                return false;
-            }
-        }
-
-        //Code to test connection
-        /*
-        try {
-            btSocket.getOutputStream().write("City of stars".getBytes());
-        } catch (IOException e) {
-            Log.d("Failed_Write", "Could not write to socket.");
-            return false;
-        }
-        try {
-            byte[] buffer = new byte[1024];
-            int bytes = btSocket.getInputStream().read(buffer);
-            String readMessage = new String(buffer, 0, bytes);
-            Log.d("Thomas message", readMessage);
-        } catch (IOException e) {
-            Log.d("Failed_Read", "Could not read from socket.");
-            return false;
-        }*/
-        return true;
+    public void alert(String title, String text){
+        new AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(text)
+            .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    System.exit(0);
+                }
+            })
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
     }
 }

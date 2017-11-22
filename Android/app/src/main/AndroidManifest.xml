@@ -20,8 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".QRScannerActivity"></activity>
-        <activity android:name=".BluetoothActivity"></activity>
+        <activity android:name=".QRScannerActivity" />
+        <activity android:name=".BluetoothActivity" />
+        <activity android:name=".ConnectionActivity" />
     </application>
 
 </manifest>

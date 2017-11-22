@@ -14,12 +14,11 @@
         android:onClick="changeActivity2BluetoothPair"
         android:text="Pairing" />
 
-    <TextView
-        android:id="@+id/statusTV"
+    <Button
+        android:id="@+id/skipButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="TextView"
-        android:visibility="invisible" />
+        android:onClick="changeActivity2Connection"
+        android:text="Already paired? click here" />
 
 </LinearLayout>

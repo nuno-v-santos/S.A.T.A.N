@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.sirs.ssandroidapp;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,8 +20,7 @@ public class QRScannerActivity extends AppCompatActivity implements ZXingScanner
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        computer = (Computer) savedInstanceState.getSerializable(Constants.COMPUTER_OBJ); // gets computer obj from BluetoothActivity
-
+        computer = (Computer) getIntent().getSerializableExtra(Constants.COMPUTER_OBJ);
         zXingScannerView = new ZXingScannerView(getApplicationContext());
         setContentView(zXingScannerView);  // use zXing qrScanner layout
         zXingScannerView.setResultHandler(this);
@@ -65,19 +65,15 @@ public class QRScannerActivity extends AppCompatActivity implements ZXingScanner
         try {
             computer.setupPublicKey(qrMsg);
         } catch (Exception e) { // invalid public key scanned, repeat
-            Toast.makeText(getApplicationContext(), R.string.qr_code_read_success_msg, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Invalid public key scanned", Toast.LENGTH_LONG).show();
             setContentView(zXingScannerView);
             zXingScannerView.resumeCameraPreview(this);
             zXingScannerView.startCamera();
             return;
         }
 
-        Intent intent = new Intent(this, MainActivity.class);
-
-        Bundle b = new Bundle();
-        b.putSerializable(Constants.COMPUTER_OBJ, computer);
-
-        intent.putExtras(b);
+        Intent intent = new Intent(this, ConnectionActivity.class);
+        intent.putExtra(Constants.COMPUTER_OBJ, computer);
         startActivity(intent);
     }
 }
