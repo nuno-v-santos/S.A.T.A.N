@@ -1,21 +1,15 @@
 package pt.ulisboa.tecnico.sirs.ssandroidapp;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.security.PublicKey;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     Computer computer;
@@ -24,6 +18,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        TextView tv = findViewById(R.id.deviceNameTB);
+
+        if (getComputer()) {
+            tv.setText(computer.getName());
+            Button b = findViewById(R.id.connectionButton);
+            b.setVisibility(View.VISIBLE);
+            b = findViewById(R.id.unpairButton);
+            b.setVisibility(View.VISIBLE);
+        }
+        else tv.setText(R.string.no_current_computer);
     }
 
     public void changeActivity2BluetoothPair(View view) {
@@ -31,17 +35,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void changeActivity2Connection(View view){
+    public boolean getComputer() {
+        boolean success = false;
         try {
             ObjectInputStream ois = new ObjectInputStream(this.openFileInput(Constants.COMPUTER_OBJ_FILENAME));
             computer = (Computer) ois.readObject();
             ois.close();
-            if (computer == null)
-                Toast.makeText(getApplicationContext(), "Dont have any paired computer", Toast.LENGTH_LONG).show();
-            else{
-                Intent intent = new Intent(this, ConnectionActivity.class);
-                startActivity(intent);
-            }
+            if (computer != null)
+                success = true;
         } catch (IOException ie) {
             // pairing not done yet or filesystem error -> pairing phase needs to be done again
             Toast.makeText(getApplicationContext(), R.string.IOException_read_obj_error_msg, Toast.LENGTH_LONG).show();
@@ -49,6 +50,26 @@ public class MainActivity extends AppCompatActivity {
             // unable to get computer obj, pairing needs to be done again
             Toast.makeText(getApplicationContext(), R.string.ClassNotFoundException_error_msg, Toast.LENGTH_LONG).show();
         }
+
+        return success;
+    }
+
+    public void changeActivity2Connection(View view){
+        Intent intent = new Intent(this, ConnectionActivity.class);
+        startActivity(intent);
+    }
+
+    public void unpair(View view) {
+        this.deleteFile(Constants.COMPUTER_OBJ_FILENAME);
+
+        // hides ui related to computer
+        Button b = findViewById(R.id.connectionButton);
+        b.setVisibility(View.INVISIBLE);
+        b = findViewById(R.id.unpairButton);
+        b.setVisibility(View.INVISIBLE);
+
+        TextView tv = findViewById(R.id.deviceNameTB);
+        tv.setText(R.string.no_current_computer);
     }
 
 }

@@ -7,6 +7,24 @@
     android:orientation="vertical"
     tools:context="pt.ulisboa.tecnico.sirs.ssandroidapp.MainActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/deviceNameLabelTB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Current device:" />
+
+        <TextView
+            android:id="@+id/deviceNameTB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="[device name]" />
+    </LinearLayout>
+
     <Button
         android:id="@+id/pairingButton"
         android:layout_width="match_parent"
@@ -15,10 +33,19 @@
         android:text="Pairing" />
 
     <Button
-        android:id="@+id/skipButton"
+        android:id="@+id/connectionButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="changeActivity2Connection"
-        android:text="Already paired? click here" />
+        android:text="Connection"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/unpairButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="unpair"
+        android:text="Unpair current device"
+        android:visibility="invisible" />
 
 </LinearLayout>

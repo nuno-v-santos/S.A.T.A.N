@@ -5,4 +5,5 @@
     <string name="current_paired_computer_name_msg">Currently connected to: </string>
     <string name="IOException_read_obj_error_msg">Pairing not yet done.</string>
     <string name="IOException_write_obj_error_msg">Could not save Computer obj...</string>
+    <string name="no_current_computer">None</string>
 </resources>

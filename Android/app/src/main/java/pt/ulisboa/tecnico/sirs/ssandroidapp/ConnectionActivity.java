@@ -27,20 +27,18 @@ public class ConnectionActivity extends AppCompatActivity {
         computer = (Computer) getIntent().getSerializableExtra(Constants.COMPUTER_OBJ);
 
         // shows current paired computer name onscreen if exists
-        if (computer != null) {
-            TextView tv = findViewById(R.id.statusTV);
-            tv.setVisibility(View.VISIBLE);
-            tv.setText("Trying to connect to paired device");
-            boolean connected = connect();
-            if (connected)
-                tv.setText( "Connection completed. You are connected with " + computer.getName());
-            else
-                tv.setText("Failed to connect to paired device");
-        }
+        TextView tv = findViewById(R.id.statusTV);
+        tv.setVisibility(View.VISIBLE);
+        tv.setText("Trying to connect to paired device");
+        boolean connected = connect();
+        if (connected)
+            tv.setText( "Connection completed. You are connected with " + computer.getName());
+        else
+            tv.setText("Failed to connect to paired device");
     }
 
     @Override
-    public void onPause() {
+    public void onPause() { // FIXME NOT ON PAUSE, SHOULD BE WHEN INITIAL CONNECTION IS COMPLETED
         super.onPause();
         try {
             ObjectOutputStream oos = new ObjectOutputStream(this.openFileOutput(Constants.COMPUTER_OBJ_FILENAME, this.MODE_PRIVATE));

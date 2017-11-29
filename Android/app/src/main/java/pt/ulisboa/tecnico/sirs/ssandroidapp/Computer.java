@@ -17,16 +17,12 @@ import java.security.spec.X509EncodedKeySpec;
 public class Computer implements Serializable {
     private String name = "default"; // bluetooth name
     private String mac = "00:00:00:00:00:00";  //bluetooth mac
-    private PublicKey publicKey;
+    private PublicKey publicKey; // FIXME this is not serializable
 
-    public void setupPublicKey(String pk) {
-        try {
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.decode(pk.trim().getBytes(), Base64.DEFAULT));
-            KeyFactory kf = KeyFactory.getInstance("RSA");
-            publicKey = kf.generatePublic(keySpec);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void setupPublicKey(String pk) throws Exception { // FIXME send specialized exception
+        /*X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.decode(pk.trim().getBytes(), Base64.DEFAULT));
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        publicKey = kf.generatePublic(keySpec);*/
     }
 
     public void setName(String name) {
