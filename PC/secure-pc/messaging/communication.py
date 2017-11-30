@@ -30,7 +30,7 @@ class BluetoothCommunication(CommunicationInterface):
 
         service_matches = bluetooth.find_service(uuid=uuid, address=address)
         # FIXME
-        assert(len(service_matches) > 0, "No service on address {}".format(address))
+        assert len(service_matches) > 0, "No service on address {}".format(address)
 
         first_match = service_matches[0]
         name, host, port = first_match['name'], first_match['host'], first_match['port']
