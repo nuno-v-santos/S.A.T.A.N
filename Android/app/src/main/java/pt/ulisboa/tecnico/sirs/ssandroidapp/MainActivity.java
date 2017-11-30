@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void changeActivity2Connection(View view){
-        Intent intent = new Intent(this, ConnectionActivity.class);
+        Intent intent = new Intent(this, KeyExchangeActivity.class);
         startActivity(intent);
     }
 

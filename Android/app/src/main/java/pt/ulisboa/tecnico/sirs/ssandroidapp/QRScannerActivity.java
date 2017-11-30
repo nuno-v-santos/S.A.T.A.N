@@ -9,7 +9,10 @@ import android.widget.Toast;
 
 import com.google.zxing.Result;
 
+import java.sql.Connection;
+
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
+import pt.ulisboa.tecnico.sirs.ssandroidapp.Messaging.BluetoothCommunication;
 
 public class QRScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private ZXingScannerView zXingScannerView;
@@ -71,7 +74,7 @@ public class QRScannerActivity extends AppCompatActivity implements ZXingScanner
             return;
         }
 
-        Intent intent = new Intent(this, ConnectionActivity.class);
+        Intent intent = new Intent(this, KeyExchangeActivity.class);
         intent.putExtra(Constants.COMPUTER_OBJ, computer);
         startActivity(intent);
     }
