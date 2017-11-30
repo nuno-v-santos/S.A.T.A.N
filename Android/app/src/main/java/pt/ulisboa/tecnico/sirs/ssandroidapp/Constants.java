@@ -14,4 +14,6 @@ public class Constants {
     public static final int RSA_KEY_SIZE = 2048;
     public static final String BLUETOOTH_OBJ = "pt.ulisboa.tecnico.sirs.ssandroidapp.Bluetooth";
     public static final int RECEIVER_BUFFER_SIZE = 2048;
+    public static final String RSA_PUBLIC_BEGIN = "-----BEGIN PUBLIC KEY-----";
+    public static final String RSA_PUBLIC_END = "-----END PUBLIC KEY-----";
 }
