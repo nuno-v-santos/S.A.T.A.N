@@ -62,7 +62,7 @@ public class QRScannerActivity extends AppCompatActivity implements ZXingScanner
 
     public void changeActivityDone(View view) {
         try {
-            computer.setupPublicKey(qrMsg);
+            computer.setupPublicKey(this, qrMsg, Constants.SHARED_PREFERENCES_KEY); // FIXME ask user for a password to cypher/decypher the computers public key
         } catch (Exception e) { // invalid public key scanned, repeat
             Toast.makeText(getApplicationContext(), "Invalid public key scanned", Toast.LENGTH_LONG).show();
             setContentView(zXingScannerView);
