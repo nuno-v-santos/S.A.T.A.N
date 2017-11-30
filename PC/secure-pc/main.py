@@ -1,23 +1,21 @@
-import wx
-from .controller import Controller
-from .communication import BluetoothInterface
+from messaging.communication import BluetoothCommunication
 from Cryptodome.PublicKey import RSA
-import qrcode
+import logging
+
 
 def main():
     # app = wx.App()
     # c = Controller()
     # app.MainLoop()
+    logging.getLogger().setLevel(logging.DEBUG)
     key = RSA.generate(2048).publickey().exportKey();
-    print("Starting bluetooth interface...")
-    bluetooth_interface = BluetoothInterface()
-    bluetooth_interface.accept_connection()
-    print("Receiving message...")
-    print(bluetooth_interface.receive())
-    msg = key
-    print('Sending {}'.format(msg))
-    bluetooth_interface.send(msg)
-    bluetooth_interface.close()
+    logging.debug("Starting bluetooth interface...")
+    with BluetoothCommunication() as bluetooth_interface:
+        bluetooth_interface.accept()
+        logging.debug("Receiving message...")
+        logging.debug(bluetooth_interface.receive(4096))
+        msg = key
+        bluetooth_interface.send(msg)
 
 
 if __name__ == '__main__':
