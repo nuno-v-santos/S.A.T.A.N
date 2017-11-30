@@ -13,13 +13,13 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/deviceNameLabelTB"
+            android:id="@+id/deviceNameLabelTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Current device:" />
 
         <TextView
-            android:id="@+id/deviceNameTB"
+            android:id="@+id/deviceNameTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="[device name]" />

@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        TextView tv = findViewById(R.id.deviceNameTB);
+        TextView tv = findViewById(R.id.deviceNameTV);
 
         if (getComputer()) {
             tv.setText(computer.getName());
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         b = findViewById(R.id.unpairButton);
         b.setVisibility(View.INVISIBLE);
 
-        TextView tv = findViewById(R.id.deviceNameTB);
+        TextView tv = findViewById(R.id.deviceNameTV);
         tv.setText(R.string.no_current_computer);
     }
 
