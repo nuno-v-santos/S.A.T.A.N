@@ -40,17 +40,17 @@ public class Computer implements Serializable {
                 new SecurePreferences(context, Constants.PREFERENCES, password, true);
         String publicKeyPEM = preferences.getString(Constants.PUBLIC_KEY_ID);
 
-        publicKeyPEM = publicKeyPEM.replace("-----BEGIN PUBLIC KEY-----\n", "");
-        publicKeyPEM = publicKeyPEM.replace("-----END PUBLIC KEY-----", "");
+        publicKeyPEM = publicKeyPEM.replace(Constants.RSA_PUBLIC_BEGIN + '\n', "");
+        publicKeyPEM = publicKeyPEM.replace(Constants.RSA_PUBLIC_END, "");
         byte[] encoded = Base64.decode(publicKeyPEM, Base64.DEFAULT);
         KeyFactory kf = KeyFactory.getInstance("RSA");
         return kf.generatePublic(new X509EncodedKeySpec(encoded));
     }
 
     public String getPublicPemFormat(PublicKey publicKey) {
-        String pemPublicKey = "-----BEGIN PUBLIC KEY-----\n";
+        String pemPublicKey = Constants.RSA_PUBLIC_BEGIN + '\n';
         pemPublicKey += new String(Base64.encode(publicKey.getEncoded(), Base64.DEFAULT));
-        pemPublicKey += "-----END PUBLIC KEY-----";
+        pemPublicKey += Constants.RSA_PUBLIC_END;
         return pemPublicKey;
     }
 
