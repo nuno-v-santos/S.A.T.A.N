@@ -12,7 +12,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:name="pt.ulisboa.tecnico.sirs.ssandroidapp.MyApplication">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,8 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".QRScannerActivity"></activity>
-        <activity android:name=".BluetoothActivity"></activity>
+        <activity android:name=".QRScannerActivity" />
+        <activity android:name=".BluetoothActivity" />
+        <activity android:name=".KeyExchangeActivity" />
     </application>
 
 </manifest>

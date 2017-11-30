@@ -11,7 +11,7 @@
 
 
     <TextView
-        android:id="@+id/publicKeyTV"
+        android:id="@+id/statusTV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Public Key:"
@@ -28,7 +28,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/publicKeyTV" />
+        app:layout_constraintTop_toBottomOf="@+id/statusTV" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -60,6 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:enabled="false"
             android:onClick="changeActivityDone"
             android:text="Done"
             tools:layout_editor_absoluteX="232dp"

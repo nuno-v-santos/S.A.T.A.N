@@ -4,22 +4,26 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.zxing.Result;
 
+import java.sql.Connection;
+
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
+import pt.ulisboa.tecnico.sirs.ssandroidapp.Messaging.BluetoothCommunication;
 
 public class QRScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
-    public static final String QR_MSG = "pt.ulisboa.tecnico.sirs.ssandroidapp.QR_MSG";
-    private static final String READ_SUCCESS = "QR successfully read!";
     private ZXingScannerView zXingScannerView;
     private String qrMsg = "";
+    private Computer computer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        computer = (Computer) getIntent().getSerializableExtra(Constants.COMPUTER_OBJ);
         zXingScannerView = new ZXingScannerView(getApplicationContext());
         setContentView(zXingScannerView);  // use zXing qrScanner layout
         zXingScannerView.setResultHandler(this);
@@ -41,16 +45,31 @@ public class QRScannerActivity extends AppCompatActivity implements ZXingScanner
 
     @Override
     public void handleResult(Result result) {
-        Toast.makeText(getApplicationContext(), READ_SUCCESS, Toast.LENGTH_SHORT).show(); // little popup saying qr read was a success
+        Toast.makeText(getApplicationContext(), R.string.qr_code_read_success_msg, Toast.LENGTH_SHORT).show(); // little popup saying qr read was a success
         zXingScannerView.stopCamera();
         setContentView(R.layout.activity_qrscanner); // change layout
         TextView tv = findViewById(R.id.qrMsgTV);
         qrMsg = result.getText();
-        // FIXME check if valid qr message
         tv.setText(qrMsg); // add qr message to text view
+
+        Button button = findViewById(R.id.doneButton);
+        if (!validPublicKey(qrMsg)) {
+            button.setEnabled(false);
+            Toast.makeText(getApplicationContext(), R.string.invalid_public_key, Toast.LENGTH_SHORT).show();
+        }
+        else button.setEnabled(true);
+    }
+
+    private boolean validPublicKey(String msg) {
+        String[] lines = msg.split("\\r?\\n");
+        return lines[0].equals(Constants.RSA_PUBLIC_BEGIN) && lines[lines.length - 1].equals(Constants.RSA_PUBLIC_END);
     }
 
     public void changeActivityRepeat(View view) {
+        retryQRScanner();
+    }
+
+    private void retryQRScanner(){
         setContentView(zXingScannerView);
         zXingScannerView.resumeCameraPreview(this);
         zXingScannerView.startCamera();
@@ -62,10 +81,16 @@ public class QRScannerActivity extends AppCompatActivity implements ZXingScanner
     }
 
     public void changeActivityDone(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        // FIXME qrMsg should be like [computer_id]:[public_key]
-        // FIXME only accept valid qrMsg and send Computer class to main activity
-        intent.putExtra(QR_MSG, qrMsg); // send qr msg to main activity
+        try {
+            computer.setupPublicKey(this, qrMsg, Constants.SHARED_PREFERENCES_KEY); // FIXME ask user for a password to cypher/decypher the computers public key
+        } catch (Exception e) { // invalid public key scanned, repeat
+            Toast.makeText(getApplicationContext(), "Invalid public key scanned", Toast.LENGTH_LONG).show();
+            retryQRScanner();
+            return;
+        }
+
+        Intent intent = new Intent(this, KeyExchangeActivity.class);
+        intent.putExtra(Constants.COMPUTER_OBJ, computer);
         startActivity(intent);
     }
 }
