@@ -140,6 +140,7 @@ public class BluetoothActivity extends AppCompatActivity {
         if (connected) {
             Intent intent = new Intent(getBaseContext(), QRScannerActivity.class);
             intent.putExtra(Constants.COMPUTER_OBJ, pc);
+            intent.putExtra(Constants.PASSWORD_ID, getIntent().getStringExtra(Constants.PASSWORD_ID));
             MyApplication app = (MyApplication) getApplicationContext();
             app.setCommunicationInterface(btCommunication);
             startActivity(intent);

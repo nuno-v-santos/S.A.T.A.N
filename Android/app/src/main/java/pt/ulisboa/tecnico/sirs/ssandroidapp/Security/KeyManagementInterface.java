@@ -10,6 +10,6 @@ import java.security.KeyPair;
 public interface KeyManagementInterface {
     Key createSymmetricKey(int keySize);
     KeyPair createAssymetricKeys(int keySize);
-    Key loadKey(String path);
-    void storeKey(Key key, String path);
+    Key loadKey(String path, String password);
+    void storeKey(Key key, String path, String password);
 }

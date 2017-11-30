@@ -15,4 +15,6 @@ public class Constants {
     public static final int RECEIVER_BUFFER_SIZE = 2048;
     public static final String RSA_PUBLIC_BEGIN = "-----BEGIN PUBLIC KEY-----";
     public static final String RSA_PUBLIC_END = "-----END PUBLIC KEY-----";
+    public static final String PASSWORD_ID = "pt.ulisboa.tecnico.sirs.ssandroidapp.password";
+    public static final String NEXT_CLASS_ID = "pt.ulisboa.tecnico.sirs.ssandroidapp.nextClass";
 }

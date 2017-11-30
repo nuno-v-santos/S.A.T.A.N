@@ -7,4 +7,5 @@
     <string name="IOException_write_obj_error_msg">Could not save Computer obj...</string>
     <string name="no_current_computer">None</string>
     <string name="invalid_public_key">Error: Scanned code is not a public key.</string>
+    <string name="invalid_password">Error: Password cannot be empty.</string>
 </resources>
