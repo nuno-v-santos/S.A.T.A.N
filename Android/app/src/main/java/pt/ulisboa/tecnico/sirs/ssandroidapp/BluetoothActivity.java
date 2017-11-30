@@ -1,17 +1,13 @@
 package pt.ulisboa.tecnico.sirs.ssandroidapp;
 
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,18 +16,21 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.UUID;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Map;
+
+import pt.ulisboa.tecnico.sirs.ssandroidapp.Messaging.BluetoothCommunication;
 
 public class BluetoothActivity extends AppCompatActivity {
 
     ArrayList<String> devices_description = new ArrayList<String>();
     ArrayAdapter<String> adapter;
-    String chosen_name;
-    String chosen_mac;
     BluetoothAdapter mBluetoothAdapter;
+    BluetoothCommunication btCommunication = new BluetoothCommunication();
+    HashMap<String,BluetoothDevice> deviceMapping = new HashMap<String, BluetoothDevice>();
+    Computer pc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +46,9 @@ public class BluetoothActivity extends AppCompatActivity {
 
         //if the device doesnt have bluetooth
         if (mBluetoothAdapter == null) {
-            alert("Not compatible", "Your phone does not support Bluetooth");
+            Toast.makeText(getApplicationContext(), "Your phone does not support BluetoothCommunication", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         }
 
         int REQUEST_ENABLE_BT = 1;
@@ -59,7 +60,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
         //if the user doesnt enable the bluetooth
         if (REQUEST_ENABLE_BT == 0){
-            alert("Bluetooth not enabled", "Bluetooth needs to be enabled to continue pairing");
+            Toast.makeText(getApplicationContext(), "BluetoothCommunication needs to be enabled to continue pairing", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
@@ -74,6 +75,7 @@ public class BluetoothActivity extends AppCompatActivity {
                     //add the already paired devices
                     for (BluetoothDevice device : mBluetoothAdapter.getBondedDevices()) {
                         devices_description.add(device.getName() + " at " + device.getAddress());
+                        deviceMapping.put(device.getAddress(),device);
                         adapter.notifyDataSetChanged();
                     }
                     registerReceiver(mReceiver, filter);
@@ -95,16 +97,8 @@ public class BluetoothActivity extends AppCompatActivity {
                 mBluetoothAdapter.cancelDiscovery();
                 //get the clicked device
                 String clickedDevice = (String) adapter.getItemAtPosition(position);
-                chosen_name = clickedDevice.split(" ")[0];
-                chosen_mac = clickedDevice.split(" ")[2];
-                //create, fill, and serialize Computer
-                Computer pc = new Computer();
-                pc.setName(chosen_name);
-                pc.setMac(chosen_mac);
-
-                Intent intent = new Intent(getBaseContext(), QRScannerActivity.class);
-                intent.putExtra(Constants.COMPUTER_OBJ, pc);
-                startActivity(intent);
+                CreatePC(clickedDevice);  //create PC and set name and mac
+                Connect2Device();
             }
         });
 
@@ -121,22 +115,32 @@ public class BluetoothActivity extends AppCompatActivity {
             String new_device = device.getName() + " at " + device.getAddress();
             if (!devices_description.contains(new_device)) {
                 devices_description.add(new_device);
+                deviceMapping.put(device.getName(),device);
                 adapter.notifyDataSetChanged();
             }
         }
         }
     };
 
-    public void alert(String title, String text){
-        new AlertDialog.Builder(this)
-            .setTitle(title)
-            .setMessage(text)
-            .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    System.exit(0);
-                }
-            })
-            .setIcon(android.R.drawable.ic_dialog_alert)
-            .show();
+    public void CreatePC(String clickedDevice) {
+        String chosen_name = clickedDevice.split(" ")[0];
+        String chosen_mac = clickedDevice.split(" ")[2];
+        pc = new Computer();
+        pc.setName(chosen_name);
+        pc.setMac(chosen_mac);
+    }
+
+    public void Connect2Device() {
+        boolean connected = btCommunication.connect(deviceMapping.get(pc.getMac()));
+
+        if (connected) {
+            Intent intent = new Intent(getBaseContext(), QRScannerActivity.class);
+            intent.putExtra(Constants.COMPUTER_OBJ, pc);
+            MyApplication app = (MyApplication) getApplicationContext();
+            app.setCommunicationInterface(btCommunication);
+            startActivity(intent);
+        } else {
+            Toast.makeText(getApplicationContext(), "Connection Failed. Try again.", Toast.LENGTH_LONG).show();
+        }
     }
 }
