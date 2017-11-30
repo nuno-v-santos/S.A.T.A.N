@@ -93,12 +93,16 @@ public class BluetoothActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapter,View v, int position, long id){
                 //Stop discovery
-                unregisterReceiver(mReceiver);
-                mBluetoothAdapter.cancelDiscovery();
-                //get the clicked device
-                String clickedDevice = (String) adapter.getItemAtPosition(position);
-                CreatePC(clickedDevice);  //create PC and set name and mac
-                Connect2Device();
+                try {
+                    unregisterReceiver(mReceiver);
+                    mBluetoothAdapter.cancelDiscovery();
+                    //get the clicked device
+                    String clickedDevice = (String) adapter.getItemAtPosition(position);
+                    CreatePC(clickedDevice);  //create PC and set name and mac
+                    Connect2Device();
+                } catch (IllegalArgumentException e){
+                    Toast.makeText(getApplicationContext(), "Connection Failed. Try again.", Toast.LENGTH_LONG).show();
+                }
             }
         });
 

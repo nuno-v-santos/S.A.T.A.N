@@ -6,5 +6,6 @@ package pt.ulisboa.tecnico.sirs.ssandroidapp.Security;
 
 public interface EncryptionInterface {
 
-    
+    byte[] encrypt(byte[] message);
+    byte[] decrypt(byte[] message);
 }
