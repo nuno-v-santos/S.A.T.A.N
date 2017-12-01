@@ -1,6 +1,8 @@
-from messaging.communication import BluetoothCommunication
-from Cryptodome.PublicKey import RSA
 import logging
+
+from Cryptodome.PublicKey import RSA
+
+from messaging.communication import BluetoothCommunication
 
 
 def main():
@@ -8,7 +10,7 @@ def main():
     # c = Controller()
     # app.MainLoop()
     logging.getLogger().setLevel(logging.DEBUG)
-    key = RSA.generate(2048).publickey().exportKey();
+    key = RSA.generate(2048).publickey().exportKey()
     logging.debug("Starting bluetooth interface...")
     with BluetoothCommunication() as bluetooth_interface:
         bluetooth_interface.accept()
