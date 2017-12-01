@@ -12,14 +12,14 @@ class EncryptionInterface(metaclass=ABCMeta):
     Abstract interface for encrypting and decrypting data.
     """
     @abstractmethod
-    def encrypt(self, message: bytes) -> bytes:
+    def encrypt(self, message: bytes, **kwargs) -> bytes:
         """
         :param message: message to encrypt
         :return: encrypted message
         """
         raise NotImplementedError
 
-    def decrypt(self, message: bytes) -> bytes:
+    def decrypt(self, message: bytes, **kwargs) -> bytes:
         """
         :param message: message to decrypt
         :return: decrypted message
