@@ -1,6 +1,6 @@
 import logging
 
-from Cryptodome.Hash import SHA256
+from Cryptodome.Protocol.KDF import PBKDF2
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Random import get_random_bytes
 
@@ -49,7 +49,7 @@ class AES256KeyManager(SymmetricKeyManagementInterface):
     def create_key(self, seed: bytes = None) -> Key:
         if seed is None:
             return get_random_bytes(32)
-        return SHA256.new(seed)
+        return PBKDF2(seed, b'')  # FIXME add salt?
 
     def load_key(self, path: str, password: str = None) -> Key:
         with open(path, 'rb') as f:
