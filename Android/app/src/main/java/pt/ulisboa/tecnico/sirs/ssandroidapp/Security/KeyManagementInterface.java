@@ -6,6 +6,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 
 /**
@@ -17,6 +18,6 @@ public interface KeyManagementInterface {
     KeyPair createAssymetricKeys(int keySize) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException;
     Key loadKey(Context context, String id, String password) throws NoSuchAlgorithmException, InvalidKeySpecException;
     void storeKey(Context context, Key key, String id, String password);
-
     String getKeyPEMFormat(Key key);
+    PublicKey generatePublicKeyFromPEM(String publicKeyPEM) throws NoSuchAlgorithmException, InvalidKeySpecException;
 }

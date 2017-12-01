@@ -7,7 +7,7 @@ package pt.ulisboa.tecnico.sirs.ssandroidapp;
 public class Constants {
     public static final String COMPUTER_OBJ = "pt.ulisboa.tecnico.sirs.ssandroidapp.Computer";
     public static final String COMPUTER_OBJ_FILENAME = "computer.obj";
-    public static final String PUBLIC_KEY_ID = "pt.ulisboa.tecnico.sirs.ssandroidapp.publicKey";
+    public static final String COMPUTER_PUBLIC_KEY_ID = "pt.ulisboa.tecnico.sirs.ssandroidapp.publicKey";
     public static final String PREFERENCES = "pt.ulisboa.tecnico.sirs.ssandroidapp.preferences";
     public static final String DEFAULT_UUID = "7e32b920-c98b-11e7-8f1a-0800200c9a66";
     public static final int RSA_KEY_SIZE = 2048;

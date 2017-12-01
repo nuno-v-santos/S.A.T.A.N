@@ -10,11 +10,7 @@ import android.widget.Toast;
 
 import com.google.zxing.Result;
 
-import java.security.PublicKey;
-import java.sql.Connection;
-
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
-import pt.ulisboa.tecnico.sirs.ssandroidapp.Messaging.BluetoothCommunication;
 
 public class QRScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private ZXingScannerView zXingScannerView;

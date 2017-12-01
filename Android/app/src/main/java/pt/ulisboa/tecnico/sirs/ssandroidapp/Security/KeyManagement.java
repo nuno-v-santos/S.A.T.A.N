@@ -9,6 +9,7 @@ import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAKeyGenParameterSpec;
@@ -125,5 +126,14 @@ public class KeyManagement implements KeyManagementInterface {
         String PEMKey = begin + Base64.encodeToString(key.getEncoded(), Base64.DEFAULT) + end;
 
         return PEMKey;
+    }
+
+    @Override
+    public PublicKey generatePublicKeyFromPEM(String publicKeyPEM) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        publicKeyPEM = publicKeyPEM.replace(Constants.RSA_PUBLIC_BEGIN + '\n', "");
+        publicKeyPEM = publicKeyPEM.replace(Constants.RSA_PUBLIC_END, "");
+        byte[] encoded = Base64.decode(publicKeyPEM, Base64.DEFAULT);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePublic(new X509EncodedKeySpec(encoded));
     }
 }

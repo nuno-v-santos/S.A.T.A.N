@@ -2,8 +2,6 @@ package pt.ulisboa.tecnico.sirs.ssandroidapp;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -53,9 +51,9 @@ public class KeyExchangeActivity extends AppCompatActivity {
         //send Phone public key encrypted with PC public key FIXME: export to security module
         //String PEMpublicKey = Base64.encodeToString(publicKey.getEncoded(), Base64.DEFAULT);
 
-        String PEMpublicKey = computer.getPublicPemFormat(publicKey);
+        //String PEMpublicKey = computer.getPublicPemFormat(publicKey);
 
-        btCommunication.sendMessage(PEMpublicKey.getBytes());
+        //btCommunication.sendMessage(PEMpublicKey.getBytes());
     }
 
     @Override
