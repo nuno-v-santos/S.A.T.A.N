@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import NamedTuple, Union
-from Cryptodome.PublicKey.RSA import RsaKey
 
+from Cryptodome.PublicKey.RSA import RsaKey
 
 Key = Union(RsaKey, bytes)
 KeyPair = NamedTuple('KeyPair', [('public_key', Key), ('private_key', Key)])
@@ -96,10 +96,10 @@ class SymmetricKeyManagementInterface(KeyManagementInterface):
     symmetric keys.
     """
     @abstractmethod
-    def create_key(self, size: int) -> Key:
+    def create_key(self, seed: bytes = None) -> Key:
         """
         Create a symmetric encryption key
-        :param size: the size of the key (in bits)
+        :param seed: a password to use for deriving the key (optional)
         :return: the generated key
         """
         raise NotImplementedError
