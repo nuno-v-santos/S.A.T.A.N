@@ -41,6 +41,10 @@ class AES256Encryption(EncryptionInterface):
         Encrypt the message using AES-256. The message is padded
         using PKCS7
         :Keyword Arguments:
+        *    *mode* (``int``) --
+                mode of operation for encryption
+                will change the default mode that may have been
+                provided in the constructor
         *    *iv* (``byte string``) --
                 initialization vector (for CBC, CFB and OFB modes) - 16 bytes long
                 if not provided but required, a random IV is
@@ -52,6 +56,10 @@ class AES256Encryption(EncryptionInterface):
                 if not provided but required, a random nonce is
                 generated and stored as a class member
         """
+        mode = kwargs.get('mode')
+        if mode is not None:
+            self.mode = mode
+
         iv = kwargs.get('iv')
         nonce = kwargs.get('nonce')
 
@@ -71,6 +79,10 @@ class AES256Encryption(EncryptionInterface):
         Decrypt a message using AES-256. Message is assumed
         to be padded using PKCS7
         :Keyword Arguments:
+        *    *mode* (``int``) --
+                mode of operation for encryption
+                will change the default mode that may have been
+                provided in the constructor
         *    *iv* (``byte string``) --
                 initialization vector (for CBC, CFB and OFB modes) - 16 bytes long
         *    *nonce* (``byte string``) --
@@ -78,6 +90,10 @@ class AES256Encryption(EncryptionInterface):
                 required for CTR mode
                 length must be in **[0..15]**, recommended **8**
         """
+        mode = kwargs.get('mode')
+        if mode is not None:
+            self.mode = mode
+
         nonce = kwargs.get('nonce')
 
         if iv is not None:
