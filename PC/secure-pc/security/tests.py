@@ -57,6 +57,23 @@ class AES256TestCase(unittest.TestCase):
         second_encrypted = self.cipher.encrypt(TEST_STRING1)
         self.assertNotEqual(first_encrypted, second_encrypted)
 
+    def test_eax_not_tampered(self):
+        original = TEST_STRING1
+        encrypted = self.cipher.encrypt(original, mode=self.cipher.MODE_EAX)
+        self.assertNotEqual(original, encrypted)
+        decrypted = self.cipher.decrypt(encrypted, nonce=self.cipher.nonce)
+        self.assertEqual(original, decrypted)
+
+    def test_eax_tampered(self):
+        original = TEST_STRING1
+        encrypted = self.cipher.encrypt(original, mode=self.cipher.MODE_EAX)
+        encrypted = encrypted[:4] + bytes([(encrypted[5] + 1) % 255]) + encrypted[6:]
+        try:
+            self.cipher.decrypt(encrypted, nonce=self.cipher.nonce)
+        except:
+            return
+        self.fail("Decrypt method did not throw an exception")
+
 
 if __name__ == '__main__':
     unittest.main()

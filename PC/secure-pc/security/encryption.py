@@ -21,11 +21,12 @@ class RSAEncryption(EncryptionInterface):
 
 
 class AES256Encryption(EncryptionInterface):
+    MODE_ECB = AES.MODE_ECB
     MODE_CBC = AES.MODE_CBC
     MODE_CFB = AES.MODE_CFB
-    MODE_CTR = AES.MODE_CTR
-    MODE_ECB = AES.MODE_ECB
     MODE_OFB = AES.MODE_OFB
+    MODE_CTR = AES.MODE_CTR
+    MODE_EAX = AES.MODE_EAX
 
     def __init__(self, key: Key, mode: int = MODE_ECB):
         """
@@ -40,7 +41,9 @@ class AES256Encryption(EncryptionInterface):
     def encrypt(self, message: bytes, **kwargs) -> bytes:
         """
         Encrypt the message using AES-256. The message is padded
-        using PKCS7
+        using PKCS7.
+        If using EAX mode, the verification MAC will be appended to
+        the data.
         :Keyword Arguments:
         *    *mode* (``int``) --
                 mode of operation for encryption
@@ -52,11 +55,14 @@ class AES256Encryption(EncryptionInterface):
                 generated and stored as a class member
         *    *nonce* (``byte string``) --
                 a value that must not be repeated with this key
-                required for CTR mode
+                required for CTR and EAX modes
                 length must be in **[0..15]**, recommended **8**
                 if not provided but required, a random nonce is
                 generated and stored as a class member
         """
+
+        message = pad(message, AES.block_size)
+
         mode = kwargs.get('mode')
         if mode is not None:
             self.mode = mode
@@ -73,15 +79,21 @@ class AES256Encryption(EncryptionInterface):
 
         if self.mode in (self.MODE_CBC, self.MODE_CFB, self.MODE_OFB):
             self.iv = cipher.IV
-        elif self.mode == self.MODE_CTR:
+        elif self.mode in (self.MODE_CTR, self.MODE_EAX):
             self.nonce = cipher.nonce
 
-        return cipher.encrypt(pad(message, AES.block_size))
+        if self.mode == self.MODE_EAX:
+            enc, tag = cipher.encrypt_and_digest(message)
+            return enc + tag
+
+        return cipher.encrypt(message)
 
     def decrypt(self, message: bytes, iv: bytes = None, *args, **kwargs) -> bytes:
         """
         Decrypt a message using AES-256. Message is assumed
-        to be padded using PKCS7
+        to be padded using PKCS7.
+        If using EAX mode, the verification MAC is assumed to be
+        appended to the data.
         :Keyword Arguments:
         *    *mode* (``int``) --
                 mode of operation for encryption
@@ -91,7 +103,7 @@ class AES256Encryption(EncryptionInterface):
                 initialization vector (for CBC, CFB and OFB modes) - 16 bytes long
         *    *nonce* (``byte string``) --
                 a value that must not be repeated with this key
-                required for CTR mode
+                required for CTR and EAX modes
                 length must be in **[0..15]**, recommended **8**
         """
         mode = kwargs.get('mode')
@@ -109,4 +121,9 @@ class AES256Encryption(EncryptionInterface):
         else:
             cipher = AES.new(self.key, self.mode)
 
-        return unpad(cipher.decrypt(message), AES.block_size)
+        if self.mode == self.MODE_EAX:
+            plaintext = cipher.decrypt_and_verify(message[:-16], message[-16:])
+        else:
+            plaintext = cipher.decrypt(message)
+
+        return unpad(plaintext, AES.block_size)
