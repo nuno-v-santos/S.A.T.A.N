@@ -21,11 +21,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PasswordRequestActivity"></activity>
+        <activity android:name=".PasswordRequestActivity" />
         <activity android:name=".QRScannerActivity" />
         <activity android:name=".BluetoothActivity" />
         <activity android:name=".KeyExchangeActivity" />
-        <activity android:name=".PasswordVerifyActivity"></activity>
+        <activity android:name=".PasswordVerifyActivity" />
+        <activity android:name=".ConnectionActivity"></activity>
     </application>
 
 </manifest>

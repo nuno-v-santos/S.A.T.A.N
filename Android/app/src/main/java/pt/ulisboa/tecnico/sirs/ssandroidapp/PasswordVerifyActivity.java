@@ -61,9 +61,10 @@ public class PasswordVerifyActivity extends AppCompatActivity { // Asks user a p
             return;
         }
 
-        Intent intent = new Intent(this, KeyExchangeActivity.class); // TODO connection activity
+        Intent intent = new Intent(this, ConnectionActivity.class);
 
         intent.putExtra(Constants.PASSWORD_ID, password);
+        intent.putExtra(Constants.COMPUTER_OBJ, getIntent().getSerializableExtra(Constants.COMPUTER_OBJ));
         startActivity(intent);
     }
 }

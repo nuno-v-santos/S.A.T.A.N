@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void changeActivity2Connection(View view){
         Intent intent = new Intent(this, PasswordVerifyActivity.class);
+        intent.putExtra(Constants.COMPUTER_OBJ, computer);
         startActivity(intent);
     }
 
