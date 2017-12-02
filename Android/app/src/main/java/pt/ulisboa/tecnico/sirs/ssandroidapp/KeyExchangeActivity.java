@@ -9,17 +9,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
+import java.security.SecureRandom;
 
 import pt.ulisboa.tecnico.sirs.ssandroidapp.Messaging.BluetoothCommunication;
+import pt.ulisboa.tecnico.sirs.ssandroidapp.Security.Encryption;
 import pt.ulisboa.tecnico.sirs.ssandroidapp.Security.KeyManagement;
 
 public class KeyExchangeActivity extends AppCompatActivity {
@@ -35,6 +35,7 @@ public class KeyExchangeActivity extends AppCompatActivity {
         btCommunication = (BluetoothCommunication) app.getCommunicationInterface();
 
         KeyManagement km = new KeyManagement();
+        Encryption encryption = new Encryption();
         String password = getIntent().getStringExtra(Constants.PASSWORD_ID);
 
         TextView statusTV = findViewById(R.id.statusTV);
@@ -47,31 +48,54 @@ public class KeyExchangeActivity extends AppCompatActivity {
             PublicKey publicKey = keyPair.getPublic();
             PrivateKey privateKey = keyPair.getPrivate();
 
-            // Public Key dispatch [KEK]
-            statusTV.setText(R.string.public_dispatch);
-            progressBar.setProgress(15);
-            String publicPEMKey = km.getKeyPEMFormat(publicKey);
-            byte[] encryptedPublic = publicPEMKey.getBytes(); // TODO cypher using Computer public
-            btCommunication.sendMessage(encryptedPublic);
-
             // TEK Establishment
             statusTV.setText(R.string.tek_establishment);
+            progressBar.setProgress(15);
+            Key TEK = km.createSymmetricKey(Constants.AES_KEY_SIZE);
+            byte[] encryptedTEK = encryption.RSAencrypt(TEK.getEncoded(), computerPublicKey);
+            btCommunication.sendMessage(encryptedTEK);
+
+            // Public Key dispatch [KEK]
+            statusTV.setText(R.string.public_dispatch);
             progressBar.setProgress(30);
-            byte[] encryptedTEK = btCommunication.receiveMessage();
-            byte[] encodedTEK = encryptedTEK; // TODO decypher using own private key
+            SecureRandom random = new SecureRandom();
+            byte[] ivTEK = new byte[16];
+            random.nextBytes(ivTEK);
+
+            String publicPEMKey = km.getKeyPEMFormat(publicKey);
+
+            byte[] encryptedPublic = encryption.AESencrypt(publicPEMKey.getBytes(), TEK, "CBC", ivTEK);
+
+            // iv || publicKey[TEK]
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            baos.write(ivTEK);
+            baos.write(encryptedPublic);
+            encryptedPublic = baos.toByteArray();
+
+            btCommunication.sendMessage(encryptedPublic);
 
             // DEK and MEK generation
             statusTV.setText(R.string.dek_mek_establishment);
             progressBar.setProgress(45);
             Key DEK = km.createSymmetricKey(Constants.AES_KEY_SIZE);
             Key MEK = km.createSymmetricKey(Constants.AES_KEY_SIZE);
+            byte[] ivMEK = new byte[16];
+            random.nextBytes(ivMEK);
+            random.nextBytes(ivTEK);
 
             // DEK(MEK)[TEK] Dispatch
             statusTV.setText(R.string.dek_mek_dispatch);
             progressBar.setProgress(60);
-            byte[] encryptedDEK = DEK.getEncoded(); // TODO cypher using MEK
-            byte[] encrytedDEKMEK = encryptedDEK; /// TODO cypher using TEK
-            btCommunication.sendMessage(encrytedDEKMEK);
+            byte[] encryptedDEK = encryption.AESencrypt(DEK.getEncoded(), MEK, "CBC", ivMEK);
+            byte[] encryptedDEKMEK = encryption.AESencrypt(encryptedDEK, TEK, "CBC", ivTEK);
+
+            // iv || DEK(MEK)[TEK]
+            baos = new ByteArrayOutputStream();
+            baos.write(ivTEK);
+            baos.write(encryptedDEKMEK);
+            encryptedDEKMEK = baos.toByteArray();
+
+            btCommunication.sendMessage(encryptedDEKMEK);
 
             btCommunication.close();
 
@@ -81,27 +105,13 @@ public class KeyExchangeActivity extends AppCompatActivity {
             km.storeKey(this, publicKey, Constants.ANDROID_PUBLIC_KEY_ID, password);
             km.storeKey(this, privateKey, Constants.ANDROID_PRIVATE_KEY_ID, password);
             km.storeKey(this, MEK, Constants.ANDROID_MEK_ID, password);
+            km.storeIV(this, ivMEK, Constants.ANDROID_MEK_IV_ID, password);
 
-        } catch (NoSuchAlgorithmException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            return;
-        } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-            Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            return;
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-            Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
+            abort();
             return;
         }
-
 
         // Store computer object in device filesystem
         try {
@@ -121,6 +131,12 @@ public class KeyExchangeActivity extends AppCompatActivity {
     }
 
     public void changeActivity2Main(View view) {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    private void abort() {
+        Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }

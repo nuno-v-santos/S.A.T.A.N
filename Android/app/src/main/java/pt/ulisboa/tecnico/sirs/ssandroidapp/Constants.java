@@ -25,4 +25,5 @@ public class Constants {
     public static final String ANDROID_PUBLIC_KEY_ID = "pt.ulisboa.tecnico.sirs.ssandroidapp.androidPublicKey";
     public static final String ANDROID_PRIVATE_KEY_ID = "pt.ulisboa.tecnico.sirs.ssandroidapp.androidPublicKey";
     public static final String ANDROID_MEK_ID = "pt.ulisboa.tecnico.sirs.ssandroidapp.MEK";
+    public static final String ANDROID_MEK_IV_ID = "pt.ulisboa.tecnico.sirs.ssandroidapp.MEKiv";
 }
