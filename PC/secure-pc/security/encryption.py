@@ -1,5 +1,6 @@
 from Cryptodome.Cipher import AES, PKCS1_OAEP
 from Cryptodome.Util.Padding import pad, unpad
+from Cryptodome.Hash import SHA256
 
 from .interfaces import EncryptionInterface, Key
 
@@ -12,11 +13,11 @@ class RSAEncryption(EncryptionInterface):
         self.key = key
 
     def encrypt(self, message: bytes, **kwargs) -> bytes:
-        cipher = PKCS1_OAEP.new(self.key)
+        cipher = PKCS1_OAEP.new(self.key, hashAlgo=SHA256)
         return cipher.encrypt(message)
 
     def decrypt(self, message: bytes, **kwargs) -> bytes:
-        cipher = PKCS1_OAEP.new(self.key)
+        cipher = PKCS1_OAEP.new(self.key, hashAlgo=SHA256)
         return cipher.decrypt(message)
 
 
