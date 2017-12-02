@@ -9,4 +9,13 @@
     <string name="invalid_public_key">Error: Scanned code is not a public key.</string>
     <string name="invalid_empty_password">Error: Password cannot be empty.</string>
     <string name="incorrect_password">Error: Password is incorrect.</string>
+    <string name="generating_pair">Generating Android RSA keypair.</string>
+    <string name="public_dispatch">Sending to Computer Android Public Key.</string>
+    <string name="tek_establishment">Waiting for Computer Session Key (TEK).</string>
+    <string name="dek_mek_establishment">Generating DEK and MEK.</string>
+    <string name="dek_mek_dispatch">Sending to Computer DEK(MEK).</string>
+    <string name="key_storing">Storing Android RSA keypair and MEK.</string>
+    <string name="computer_storing">Storing Computer object in filesystem.</string>
+    <string name="pairing_completed">Android successfully paired with %s. </string>
+    <string name="error">Error:</string>
 </resources>
