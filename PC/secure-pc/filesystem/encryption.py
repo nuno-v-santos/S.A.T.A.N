@@ -21,7 +21,7 @@ def encrypt_file(path: str, key: Key) -> bytes:
     log_encryption_start(path, cipher.nonce)
 
     if not os.path.isdir(backup_dir):
-        os.mkdir(backup_dir, 0o600)
+        os.makedirs(backup_dir, 0o600, exist_ok=True)
     shutil.copy2(path, backup_dir)
 
     with open(path, 'wb') as f:
@@ -48,7 +48,7 @@ def decrypt_file(path: str, key: Key, nonce: bytes) -> None:
     log_decryption_start(path)
 
     if not os.path.isdir(backup_dir):
-        os.mkdir(backup_dir, 0o600)
+        os.makedirs(backup_dir, 0o600, exist_ok=True)
     shutil.copy2(path, backup_dir)
 
     with open(path, 'wb') as f:
