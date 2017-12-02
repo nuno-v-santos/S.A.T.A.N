@@ -42,13 +42,28 @@ class AES256Encryption(EncryptionInterface):
         using PKCS7
         :Keyword Arguments:
         *    *iv* (``byte string``) --
-                initialization vector (for applicable modes)
+                initialization vector (for CBC, CFB and OFB modes) - 16 bytes long
                 if not provided but required, a random IV is
+                generated and stored as a class member
+        *    *nonce* (``byte string``) --
+                a value that must not be repeated with this key
+                required for CTR mode
+                length must be in **[0..15]**, recommended **8**
+                if not provided but required, a random nonce is
                 generated and stored as a class member
         """
         iv = kwargs.get('iv')
-        cipher = AES.new(self.key, self.mode, iv=iv)
-        self.iv = cipher.IV
+        nonce = kwargs.get('nonce')
+
+        if iv is not None:
+            cipher = AES.new(self.key, self.mode, iv=iv)
+            self.iv = cipher.IV
+        elif nonce is not None:
+            cipher = AES.new(self.key, self.mode, nonce=nonce)
+            self.nonce = cipher.nonce
+        else:
+            cipher = AES.new(self.key, self.mode)
+
         return cipher.encrypt(pad(message, AES.block_size))
 
     def decrypt(self, message: bytes, iv: bytes = None, *args, **kwargs) -> bytes:
@@ -57,7 +72,21 @@ class AES256Encryption(EncryptionInterface):
         to be padded using PKCS7
         :Keyword Arguments:
         *    *iv* (``byte string``) --
-                initialization vector (mandatory for applicable modes)
+                initialization vector (for CBC, CFB and OFB modes) - 16 bytes long
+        *    *nonce* (``byte string``) --
+                a value that must not be repeated with this key
+                required for CTR mode
+                length must be in **[0..15]**, recommended **8**
         """
-        cipher = AES.new(self.key, iv)
+        nonce = kwargs.get('nonce')
+
+        if iv is not None:
+            cipher = AES.new(self.key, self.mode, iv=iv)
+            self.iv = cipher.IV
+        elif nonce is not None:
+            cipher = AES.new(self.key, self.mode, nonce=nonce)
+            self.nonce = cipher.nonce
+        else:
+            cipher = AES.new(self.key, self.mode)
+
         return unpad(cipher.decrypt(message), AES.block_size)
