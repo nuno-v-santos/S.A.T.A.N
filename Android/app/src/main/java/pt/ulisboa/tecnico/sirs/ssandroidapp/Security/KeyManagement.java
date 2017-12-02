@@ -36,6 +36,11 @@ public class KeyManagement implements KeyManagementInterface {
     }
 
     @Override
+    public Key createSymmetricKey(byte[] encodedKey) throws NoSuchAlgorithmException {
+        return new SecretKeySpec(encodedKey, "AES");
+    }
+
+    @Override
     public KeyPair createAssymetricKeys(int keySize) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         RSAKeyGenParameterSpec spec = new RSAKeyGenParameterSpec(keySize, RSAKeyGenParameterSpec.F4);
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
@@ -105,22 +110,9 @@ public class KeyManagement implements KeyManagementInterface {
     }
 
     @Override
-    public String getKeyPEMFormat(Key key) {
-        String begin;
-        String end;
-
-        switch (key.getAlgorithm()) {
-            case ("RSA") :  // Assumption: app will never ask for a private key PEM format
-                begin = Constants.RSA_PUBLIC_BEGIN + "\n";
-                end = Constants.RSA_PUBLIC_END;
-                break;
-            case ("AES") :
-                begin = Constants.AES_BEGIN + "\n"; // FIXME wrong format?
-                end = Constants.AES_END;
-                break;
-            default :
-                throw new UnsupportedOperationException();
-        }
+    public String getKeyPEMFormat(PublicKey key) {
+        String begin = Constants.RSA_PUBLIC_BEGIN + "\n";
+        String end = Constants.RSA_PUBLIC_END;
 
         String PEMKey = begin + Base64.encodeToString(key.getEncoded(), Base64.DEFAULT) + end;
 
