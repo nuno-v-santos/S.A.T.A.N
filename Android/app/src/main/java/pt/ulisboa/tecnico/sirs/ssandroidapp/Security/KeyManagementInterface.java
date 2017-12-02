@@ -15,6 +15,7 @@ import java.security.spec.InvalidKeySpecException;
 
 public interface KeyManagementInterface {
     Key createSymmetricKey(int keySize) throws NoSuchAlgorithmException;
+    Key createSymmetricKey(byte[] encodedKey) throws NoSuchAlgorithmException;
     KeyPair createAssymetricKeys(int keySize) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException;
     Key loadKey(Context context, String id, String password) throws NoSuchAlgorithmException, InvalidKeySpecException;
     void storeKey(Context context, Key key, String id, String password);

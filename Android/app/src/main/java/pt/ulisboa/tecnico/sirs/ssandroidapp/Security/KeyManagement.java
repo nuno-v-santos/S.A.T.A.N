@@ -36,6 +36,11 @@ public class KeyManagement implements KeyManagementInterface {
     }
 
     @Override
+    public Key createSymmetricKey(byte[] encodedKey) throws NoSuchAlgorithmException {
+        return new SecretKeySpec(encodedKey, "AES");
+    }
+
+    @Override
     public KeyPair createAssymetricKeys(int keySize) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         RSAKeyGenParameterSpec spec = new RSAKeyGenParameterSpec(keySize, RSAKeyGenParameterSpec.F4);
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
