@@ -4,10 +4,10 @@ import logging
 logger = logging.getLogger('tolerance')
 
 
-def log_encryption_start(path: str, iv: bytes):
-    logger.debug('Encrypting {path} with iv {iv}'.format(
+def log_encryption_start(path: str, nonce: bytes):
+    logger.debug('Encrypting {path} with nonce {nonce}'.format(
         path=path,
-        iv=iv.hex()
+        nonce=nonce.hex()
     ))
 
 
