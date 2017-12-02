@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.sirs.ssandroidapp;
+package pt.ulisboa.tecnico.sirs.ssandroidapp.Security;
 /*
 Copyright (C) 2012 Sveinung Kval Bakken, sveinung.bakken@gmail.com
 

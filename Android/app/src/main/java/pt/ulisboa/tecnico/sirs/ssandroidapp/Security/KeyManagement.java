@@ -20,7 +20,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import pt.ulisboa.tecnico.sirs.ssandroidapp.Constants;
-import pt.ulisboa.tecnico.sirs.ssandroidapp.SecurePreferences;
 
 /**
  * Created by Guilherme on 01/12/2017.
