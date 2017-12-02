@@ -25,11 +25,15 @@ import pt.ulisboa.tecnico.sirs.ssandroidapp.Messaging.BluetoothCommunication;
 
 public class BluetoothActivity extends AppCompatActivity {
 
-    ArrayList<String> devices_description = new ArrayList<String>();
-    ArrayAdapter<String> adapter;
-    BluetoothAdapter mBluetoothAdapter;
+    ArrayList<String> paired_devices_description = new ArrayList<>();
+    ListView pairedDevicesList;
+    ArrayList<String> discovered_devices_description = new ArrayList<>();
+    ListView discoveredDevicesList;
+    ArrayAdapter<String> pairedAdapter;
+    ArrayAdapter<String> discoveredAdapter;
+    BluetoothAdapter btAdapter;
     BluetoothCommunication btCommunication = new BluetoothCommunication();
-    HashMap<String,BluetoothDevice> deviceMapping = new HashMap<String, BluetoothDevice>();
+    HashMap<String,BluetoothDevice> deviceMapping = new HashMap<>();
     Computer pc;
 
     @Override
@@ -37,75 +41,93 @@ public class BluetoothActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
 
-        ListView list = (ListView) findViewById(R.id.devices_list);
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_selectable_list_item, devices_description);
-        list.setAdapter(adapter);
+        pairedDevicesList = findViewById(R.id.paired_devices_list);
+        discoveredDevicesList = findViewById(R.id.discovered_devices_list);
 
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        pairedAdapter = new ArrayAdapter<>(this,
+                                    android.R.layout.simple_selectable_list_item,
+                                    paired_devices_description);
+        pairedDevicesList.setAdapter(pairedAdapter);
 
-        //if the device doesnt have bluetooth
-        if (mBluetoothAdapter == null) {
-            Toast.makeText(getApplicationContext(), "Your phone does not support BluetoothCommunication", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-        }
+        discoveredAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_selectable_list_item,
+                discovered_devices_description);
+        discoveredDevicesList.setAdapter(discoveredAdapter);
 
-        int REQUEST_ENABLE_BT = 1;
-        //If bluetooth is not enabled, request to enable
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-
-        //if the user doesnt enable the bluetooth
-        if (REQUEST_ENABLE_BT == 0){
-            Toast.makeText(getApplicationContext(), "BluetoothCommunication needs to be enabled to continue pairing", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-        }
+        //if the device doesnt have bluetooth, or it isnt enabled
+        checkDeviceBluetooth();
 
         //set listener for the scan button
-        Switch scan = (Switch) findViewById(R.id.scan_button);
+        scanButtonListener();
+
+        //set listener for the items in the list of devices
+        itemClickListener();
+    }
+
+    private void itemClickListener() {
+        //if clicked on paired device
+        pairedDevicesList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> adapter,View v, int position, long id){
+                //get the clicked device
+                String clickedDevice = (String) adapter.getItemAtPosition(position);
+                CreatePC(clickedDevice);  //create PC and set name and mac
+                Connect2Device();
+            }
+        });
+
+        //if clicked on discovered device
+        discoveredDevicesList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> adapter,View v, int position, long id){
+                //get the clicked device
+                String clickedDevice = (String) adapter.getItemAtPosition(position);
+                CreatePC(clickedDevice);  //create PC and set name and mac
+                Connect2Device();
+            }
+        });
+    }
+
+    private void scanButtonListener() {
+        Switch scan = findViewById(R.id.scan_button);
         scan.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
                 if (isChecked) {
-                    adapter.clear();
+                    pairedAdapter.clear();
+                    discoveredAdapter.clear();
                     //add the already paired devices
-                    for (BluetoothDevice device : mBluetoothAdapter.getBondedDevices()) {
-                        devices_description.add(device.getName() + " at " + device.getAddress());
+                    for (BluetoothDevice device : btAdapter.getBondedDevices()) {
+                        paired_devices_description.add(device.getName() + " " + device.getAddress());
                         deviceMapping.put(device.getAddress(),device);
-                        adapter.notifyDataSetChanged();
+                        pairedAdapter.notifyDataSetChanged();
                     }
                     registerReceiver(mReceiver, filter);
-                    //find new devices
-                    mBluetoothAdapter.startDiscovery();
+                    btAdapter.startDiscovery();
                 } else {
-                    unregisterReceiver(mReceiver);
-                    mBluetoothAdapter.cancelDiscovery();
+                    if (btAdapter.isDiscovering()) {
+                        unregisterReceiver(mReceiver);
+                        btAdapter.cancelDiscovery();
+                    }
                 }
             }
         });
+    }
 
-        //set listener for the items in the list of devices
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> adapter,View v, int position, long id){
-                //Stop discovery
-                try {
-                    unregisterReceiver(mReceiver);
-                    mBluetoothAdapter.cancelDiscovery();
-                    //get the clicked device
-                    String clickedDevice = (String) adapter.getItemAtPosition(position);
-                    CreatePC(clickedDevice);  //create PC and set name and mac
-                    Connect2Device();
-                } catch (IllegalArgumentException e){
-                    Toast.makeText(getApplicationContext(), "Connection Failed. Try again.", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+    private void checkDeviceBluetooth() {
+        //If Phone doesnt have bluetooth
+        if (btAdapter == null) {
+            toast("Your phone does not support Bluetooth");
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
 
+        //If bluetooth is not enabled
+        if (!btAdapter.isEnabled()) {
+            btAdapter.enable();
+        }
     }
 
     //This discovers the devices nearby
@@ -116,19 +138,20 @@ public class BluetoothActivity extends AppCompatActivity {
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
             // Get the BluetoothDevice object from the Intent
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            String new_device = device.getName() + " at " + device.getAddress();
-            if (!devices_description.contains(new_device)) {
-                devices_description.add(new_device);
-                deviceMapping.put(device.getName(),device);
-                adapter.notifyDataSetChanged();
+            String new_device = device.getName() + " " + device.getAddress();
+            if (!discovered_devices_description.contains(new_device)) {
+                discovered_devices_description.add(new_device);
+                deviceMapping.put(device.getAddress(),device);
+                discoveredAdapter.notifyDataSetChanged();
             }
         }
         }
     };
 
     public void CreatePC(String clickedDevice) {
-        String chosen_name = clickedDevice.split(" ")[0];
-        String chosen_mac = clickedDevice.split(" ")[2];
+        String[] description = clickedDevice.split(" ");
+        String chosen_mac = description[description.length - 1];
+        String chosen_name = clickedDevice.replace(chosen_mac,"").trim();
         pc = new Computer();
         pc.setName(chosen_name);
         pc.setMac(chosen_mac);
@@ -138,13 +161,26 @@ public class BluetoothActivity extends AppCompatActivity {
         boolean connected = btCommunication.connect(deviceMapping.get(pc.getMac()));
 
         if (connected) {
-            Intent intent = new Intent(getBaseContext(), QRScannerActivity.class);
-            intent.putExtra(Constants.COMPUTER_OBJ, pc);
+            //stop discovery
+            if (btAdapter.isDiscovering()) {
+                unregisterReceiver(mReceiver);
+                btAdapter.cancelDiscovery();
+            }
+
+            //save btCommunication
             MyApplication app = (MyApplication) getApplicationContext();
             app.setCommunicationInterface(btCommunication);
+
+            Intent intent = new Intent(getBaseContext(), QRScannerActivity.class);
+            intent.putExtra(Constants.COMPUTER_OBJ, pc);
+            intent.putExtra(Constants.PASSWORD_ID, getIntent().getStringExtra(Constants.PASSWORD_ID));
             startActivity(intent);
         } else {
-            Toast.makeText(getApplicationContext(), "Connection Failed. Try again.", Toast.LENGTH_LONG).show();
+            toast("Connection Failed. Try again.");
         }
+    }
+
+    public void toast(String m){
+        Toast.makeText(getApplicationContext(), m, Toast.LENGTH_LONG).show();
     }
 }

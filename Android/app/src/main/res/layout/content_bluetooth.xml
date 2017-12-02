@@ -15,9 +15,26 @@
         android:layout_height="wrap_content"
         android:text="Scan nearby devices    " />
 
-    <ListView
-        android:id="@+id/devices_list"
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:text="Paired Devices:" />
+
+    <ListView
+        android:id="@+id/paired_devices_list"
+        android:layout_width="match_parent"
+        android:layout_height="214dp"
+        android:fadeScrollbars="false" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Discovered Devices:" />
+
+    <ListView
+        android:id="@+id/discovered_devices_list"
+        android:layout_width="match_parent"
+        android:layout_height="251dp"
+        android:fadeScrollbars="false" />
 
 </LinearLayout>

@@ -10,10 +10,7 @@ import android.widget.Toast;
 
 import com.google.zxing.Result;
 
-import java.sql.Connection;
-
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
-import pt.ulisboa.tecnico.sirs.ssandroidapp.Messaging.BluetoothCommunication;
 
 public class QRScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private ZXingScannerView zXingScannerView;
@@ -82,7 +79,7 @@ public class QRScannerActivity extends AppCompatActivity implements ZXingScanner
 
     public void changeActivityDone(View view) {
         try {
-            computer.setupPublicKey(this, qrMsg, Constants.SHARED_PREFERENCES_KEY); // FIXME ask user for a password to cypher/decypher the computers public key
+            computer.setupPublicKey(this, qrMsg, getIntent().getStringExtra(Constants.PASSWORD_ID));
         } catch (Exception e) { // invalid public key scanned, repeat
             Toast.makeText(getApplicationContext(), "Invalid public key scanned", Toast.LENGTH_LONG).show();
             retryQRScanner();
@@ -91,6 +88,7 @@ public class QRScannerActivity extends AppCompatActivity implements ZXingScanner
 
         Intent intent = new Intent(this, KeyExchangeActivity.class);
         intent.putExtra(Constants.COMPUTER_OBJ, computer);
+        intent.putExtra(Constants.PASSWORD_ID, getIntent().getStringExtra(Constants.PASSWORD_ID));
         startActivity(intent);
     }
 }

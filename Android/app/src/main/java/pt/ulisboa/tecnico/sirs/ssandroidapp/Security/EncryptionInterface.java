@@ -1,11 +1,15 @@
 package pt.ulisboa.tecnico.sirs.ssandroidapp.Security;
 
+import java.security.Key;
+
 /**
  * Created by Nuno Santos on 30/11/2017.
  */
 
 public interface EncryptionInterface {
 
-    byte[] encrypt(byte[] message);
-    byte[] decrypt(byte[] message);
+    byte[] AESencrypt(byte[] message, Key key, String mode, byte[] iv) throws Exception;
+    byte[] AESdecrypt(byte[] message, Key key, String mode, byte[] iv) throws Exception;
+    byte[] RSAencrypt(byte[] message, Key key) throws Exception;
+    byte[] RSAdecrypt(byte[] message, Key key) throws Exception;
 }

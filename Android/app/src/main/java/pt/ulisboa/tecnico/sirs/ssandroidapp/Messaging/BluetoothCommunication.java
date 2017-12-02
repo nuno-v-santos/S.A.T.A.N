@@ -62,4 +62,14 @@ public class BluetoothCommunication implements CommunicationInterface{
         }
         return buffer;
     }
+
+    @Override
+    public void close() {
+        if (btSocket!=null)
+            try {
+                btSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
 }
