@@ -31,10 +31,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void changeActivity2BluetoothPair(View view) {
-        Intent intent = new Intent(this, PasswordActivity.class);
-        String nextClassName = BluetoothActivity.class.getName();
-        intent.putExtra(Constants.NEXT_CLASS_ID, nextClassName);
-
+        Intent intent = new Intent(this, PasswordRequestActivity.class);
         startActivity(intent);
     }
 
@@ -58,10 +55,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void changeActivity2Connection(View view){
-        Intent intent = new Intent(this, PasswordActivity.class);
-        String nextClassName = KeyExchangeActivity.class.getName();
-        intent.putExtra(Constants.NEXT_CLASS_ID, nextClassName);
-
+        Intent intent = new Intent(this, PasswordVerifyActivity.class);
         startActivity(intent);
     }
 
