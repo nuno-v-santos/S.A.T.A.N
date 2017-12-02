@@ -18,6 +18,6 @@ public interface KeyManagementInterface {
     KeyPair createAssymetricKeys(int keySize) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException;
     Key loadKey(Context context, String id, String password) throws NoSuchAlgorithmException, InvalidKeySpecException;
     void storeKey(Context context, Key key, String id, String password);
-    String getKeyPEMFormat(Key key);
+    String getKeyPEMFormat(PublicKey key);
     PublicKey generatePublicKeyFromPEM(String publicKeyPEM) throws NoSuchAlgorithmException, InvalidKeySpecException;
 }
