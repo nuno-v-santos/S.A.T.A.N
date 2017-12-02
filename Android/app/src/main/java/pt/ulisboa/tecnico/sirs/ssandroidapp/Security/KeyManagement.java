@@ -59,18 +59,18 @@ public class KeyManagement implements KeyManagementInterface {
 
         Key key;
         if (lines[0].equals(Constants.RSA_PUBLIC_BEGIN)) {                  // Public RSA key load
-            base64Key.replace(Constants.RSA_PUBLIC_BEGIN + '\n', "");
+            base64Key = base64Key.replace(Constants.RSA_PUBLIC_BEGIN + '\n', "");
             byte[] encoded = Base64.decode(base64Key, Base64.DEFAULT);
             KeyFactory kf = KeyFactory.getInstance("RSA");
             key = kf.generatePublic(new X509EncodedKeySpec(encoded));
 
         } else if (lines[0].equals(Constants.RSA_PRIVATE_BEGIN)) {          // Private RSA key load
-            base64Key.replace(Constants.RSA_PRIVATE_BEGIN + '\n', "");
+            base64Key = base64Key.replace(Constants.RSA_PRIVATE_BEGIN + '\n', "");
             byte[] encoded = Base64.decode(base64Key, Base64.DEFAULT);
             KeyFactory kf = KeyFactory.getInstance("RSA");
             key = kf.generatePrivate(new PKCS8EncodedKeySpec(encoded));
         } else {                                                            // AES key load
-            base64Key.replace(Constants.AES_BEGIN + '\n', "");
+            base64Key = base64Key.replace(Constants.AES_BEGIN + '\n', "");
             byte[] encoded = Base64.decode(base64Key, Base64.DEFAULT);
             key = new SecretKeySpec(encoded, "AES");
         }
