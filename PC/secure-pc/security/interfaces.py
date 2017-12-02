@@ -3,7 +3,7 @@ from typing import NamedTuple, Union
 
 from Cryptodome.PublicKey.RSA import RsaKey
 
-Key = Union(RsaKey, bytes)
+Key = Union[RsaKey, bytes]
 KeyPair = NamedTuple('KeyPair', [('public_key', Key), ('private_key', Key)])
 
 
