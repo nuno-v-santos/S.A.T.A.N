@@ -1,7 +1,7 @@
-from .interfaces import EncryptionInterface, Key
-
 from Cryptodome.Cipher import AES, PKCS1_OAEP
 from Cryptodome.Util.Padding import pad, unpad
+
+from .interfaces import EncryptionInterface, Key
 
 
 class RSAEncryption(EncryptionInterface):
@@ -35,6 +35,7 @@ class AES256Encryption(EncryptionInterface):
         self.key = key
         self.mode = mode
         self.iv = None
+        self.nonce = None
 
     def encrypt(self, message: bytes, **kwargs) -> bytes:
         """
@@ -65,12 +66,15 @@ class AES256Encryption(EncryptionInterface):
 
         if iv is not None:
             cipher = AES.new(self.key, self.mode, iv=iv)
-            self.iv = cipher.IV
         elif nonce is not None:
             cipher = AES.new(self.key, self.mode, nonce=nonce)
-            self.nonce = cipher.nonce
         else:
             cipher = AES.new(self.key, self.mode)
+
+        if self.mode in (self.MODE_CBC, self.MODE_CFB, self.MODE_OFB):
+            self.iv = cipher.IV
+        elif self.mode == self.MODE_CTR:
+            self.nonce = cipher.nonce
 
         return cipher.encrypt(pad(message, AES.block_size))
 
