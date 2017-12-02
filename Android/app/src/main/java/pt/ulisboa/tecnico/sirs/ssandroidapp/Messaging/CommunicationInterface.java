@@ -10,4 +10,5 @@ public interface CommunicationInterface {
     boolean connect(BluetoothDevice btDevice);
     void sendMessage(byte[] message);
     byte[] receiveMessage();
+    void close();
 }

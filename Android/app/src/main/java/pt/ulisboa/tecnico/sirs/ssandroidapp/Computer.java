@@ -1,14 +1,12 @@
 package pt.ulisboa.tecnico.sirs.ssandroidapp;
 
 import android.content.Context;
-import android.util.Base64;
 
 import java.io.Serializable;
-import java.security.KeyFactory;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 
 import pt.ulisboa.tecnico.sirs.ssandroidapp.Security.KeyManagement;
 
@@ -36,8 +34,8 @@ public class Computer implements Serializable {
         km.storeKey(context, pk, Constants.COMPUTER_PUBLIC_KEY_ID, password);
     }
 
-    public PublicKey getPublicKey(Context context, String password) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public Key getPublicKey(Context context, String password) throws InvalidKeySpecException, NoSuchAlgorithmException {
         KeyManagement km = new KeyManagement();
-        return (PublicKey) km.loadKey(context, Constants.COMPUTER_PUBLIC_KEY_ID, password);
+        return km.loadKey(context, Constants.COMPUTER_PUBLIC_KEY_ID, password);
     }
 }
