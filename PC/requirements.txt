@@ -5,3 +5,4 @@ pybluez>=0.22
 pyyaml>=3.12
 pypubsub>=4.0.0
 pycryptodomex>=3.4.7
+appdirs>=1.4.0

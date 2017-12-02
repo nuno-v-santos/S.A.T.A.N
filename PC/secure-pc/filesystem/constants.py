@@ -1,5 +1,5 @@
-import tempfile
-import os
+import appdirs
+from ..constants import APP_NAME
 
 
-backup_dir = os.path.join(tempfile.gettempdir(), 'secure-pc')
+backup_dir = appdirs.user_cache_dir(APP_NAME)
