@@ -11,56 +11,36 @@ import javax.crypto.spec.IvParameterSpec;
 public class Encryption implements EncryptionInterface {
 
     @Override
-    public byte[] AESencrypt(byte[] message, Key key, String mode, byte[] iv) {
+    public byte[] AESencrypt(byte[] message, Key key, String mode, byte[] iv) throws Exception {
         Cipher cipher;
         IvParameterSpec ivSpec = new IvParameterSpec(iv);
 
-        try {
-            cipher = Cipher.getInstance("AES/" + mode + "/PKCS7Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec);
-            return cipher.doFinal(message);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return new byte[0];
+        cipher = Cipher.getInstance("AES/" + mode + "/PKCS7Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec);
+        return cipher.doFinal(message);
     }
 
     @Override
-    public byte[] AESdecrypt(byte[] message, Key key, String mode, byte[] iv) {
+    public byte[] AESdecrypt(byte[] message, Key key, String mode, byte[] iv) throws Exception {
         Cipher cipher;
         IvParameterSpec ivSpec = new IvParameterSpec(iv);
 
-        try {
-            cipher = Cipher.getInstance("AES" + mode + "PKCS7Padding");
-            cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
-            return cipher.doFinal(message);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return new byte[0];
+        cipher = Cipher.getInstance("AES/" + mode + "/PKCS7Padding");
+        cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
+        return cipher.doFinal(message);
     }
 
     @Override
-    public byte[] RSAencrypt(byte[] message, Key key) {
-        try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-            return cipher.doFinal(message);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return new byte[0];
+    public byte[] RSAencrypt(byte[] message, Key key) throws Exception {
+        Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        return cipher.doFinal(message);
     }
 
     @Override
-    public byte[] RSAdecrypt(byte[] message, Key key) {
-        try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            return cipher.doFinal(message);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return new byte[0];
+    public byte[] RSAdecrypt(byte[] message, Key key) throws Exception {
+        Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        return cipher.doFinal(message);
     }
 }
