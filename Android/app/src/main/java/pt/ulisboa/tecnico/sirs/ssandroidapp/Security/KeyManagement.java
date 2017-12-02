@@ -127,4 +127,21 @@ public class KeyManagement implements KeyManagementInterface {
         KeyFactory kf = KeyFactory.getInstance("RSA");
         return kf.generatePublic(new X509EncodedKeySpec(encoded));
     }
+
+    @Override
+    public byte[] loadIV(Context context, String id, String password) {
+        SecurePreferences preferences =
+                new SecurePreferences(context, Constants.PREFERENCES, password, true);
+        String base64IV = preferences.getString(id);
+        byte[] iv = Base64.decode(base64IV, Base64.DEFAULT);
+        return iv;
+    }
+
+    @Override
+    public void storeIV(Context context, byte[] iv, String id, String password) {
+        SecurePreferences preferences =
+                new SecurePreferences(context, Constants.PREFERENCES, password, true);
+        String base64IV = Base64.encodeToString(iv, Base64.DEFAULT);
+        preferences.put(Constants.ANDROID_MEK_IV_ID, base64IV);
+    }
 }

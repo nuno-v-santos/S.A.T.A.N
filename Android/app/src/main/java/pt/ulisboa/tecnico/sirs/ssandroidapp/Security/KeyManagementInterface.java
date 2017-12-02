@@ -21,4 +21,6 @@ public interface KeyManagementInterface {
     void storeKey(Context context, Key key, String id, String password);
     String getKeyPEMFormat(PublicKey key);
     PublicKey generatePublicKeyFromPEM(String publicKeyPEM) throws NoSuchAlgorithmException, InvalidKeySpecException;
+    byte[] loadIV(Context context, String id, String password);
+    void storeIV(Context context, byte[] iv, String id, String password);
 }
