@@ -19,10 +19,17 @@ public class PasswordRequestActivity extends AppCompatActivity { // Request user
 
     public void sendPassword(View view) {
         EditText et = findViewById(R.id.passwordET);
+        EditText et2 = findViewById(R.id.password2ET);
         String password = et.getText().toString();
+        String password2 = et2.getText().toString();
 
         if (password.trim().equals("")) {
             Toast.makeText(getApplicationContext(), R.string.invalid_empty_password, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (!password2.equals(password)) {
+            Toast.makeText(getApplicationContext(), R.string.password_mismatch, Toast.LENGTH_LONG).show();
             return;
         }
 

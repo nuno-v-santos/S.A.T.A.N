@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView tv = findViewById(R.id.deviceNameTV);
         tv.setText(R.string.no_current_computer);
+        computer = null;
     }
 
 }
