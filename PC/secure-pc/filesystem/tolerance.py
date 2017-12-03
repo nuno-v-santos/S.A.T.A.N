@@ -88,3 +88,7 @@ def get_file_status() -> Dict[str, str]:
                 logging.debug("File at {} was encrypted".format(path))
                 file_status[path] = 'encrypted'
     return file_status
+
+@synchronized(mutex)
+def clear_log():
+    os.remove(LOG_PATH)
