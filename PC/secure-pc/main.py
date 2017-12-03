@@ -50,7 +50,7 @@ def main():
 
     with BluetoothCommunication() as bluetooth_interface:
         logging.debug("Begin connection")
-        secure_interface = SecureCommunication(bluetooth_interface)
+        secure_interface = SecureCommunication(bluetooth_interface, phone_key, generate=True)
         secure_interface.accept()
 
 
