@@ -19,12 +19,12 @@ class EncryptionTestCase(unittest.TestCase):
         os.write(fd, self.TEST_STRING)
         os.close(fd)
 
-        encrypt_file(path, self.key, self.TEST_IV)
+        encrypt_file(path, self.key)
 
         with open(path, 'rb') as f:
             self.assertNotEqual(self.TEST_STRING, f.read())
 
-        decrypt_file(path, self.key, self.TEST_IV)
+        decrypt_file(path, self.key)
 
         with open(path, 'rb') as f:
             self.assertEqual(self.TEST_STRING, f.read())
