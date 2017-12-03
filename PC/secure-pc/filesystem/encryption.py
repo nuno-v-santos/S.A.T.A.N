@@ -16,7 +16,7 @@ def encrypt_file(path: str, key: Key) -> bytes:
     with open(path, 'rb') as f:
         data = f.read()
 
-    cipher = AES256Encryption(key, AES256Encryption.MODE_CTR)
+    cipher = AES256Encryption(key, AES256Encryption.MODE_EAX)
     encrypted = cipher.encrypt(data)
     log_encryption_start(path, cipher.nonce, cipher)
 
@@ -43,7 +43,7 @@ def decrypt_file(path: str, key: Key, nonce: bytes) -> None:
     with open(path, 'rb') as f:
         data = f.read()
 
-    cipher = AES256Encryption(key, AES256Encryption.MODE_CTR)
+    cipher = AES256Encryption(key, AES256Encryption.MODE_EAX)
     decrypted = cipher.decrypt(data, nonce=nonce)
     log_decryption_start(path)
 
