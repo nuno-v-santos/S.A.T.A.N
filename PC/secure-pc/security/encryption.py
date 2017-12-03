@@ -37,7 +37,6 @@ class AES256Encryption(EncryptionInterface):
         self.key = key
         self.mode = mode
         self.iv = None
-        self.nonce = None
 
     def encrypt(self, message: bytes, **kwargs) -> bytes:
         """
@@ -51,14 +50,8 @@ class AES256Encryption(EncryptionInterface):
                 will change the default mode that may have been
                 provided in the constructor
         *    *iv* (``byte string``) --
-                initialization vector (for CBC, CFB and OFB modes) - 16 bytes long
+                initialization vector - should not be repeated - 16 bytes long
                 if not provided but required, a random IV is
-                generated and stored as a class member
-        *    *nonce* (``byte string``) --
-                a value that must not be repeated with this key
-                required for CTR and EAX modes
-                length must be in **[0..15]**, recommended **8**
-                if not provided but required, a random nonce is
                 generated and stored as a class member
         """
 
@@ -69,23 +62,20 @@ class AES256Encryption(EncryptionInterface):
             self.mode = mode
 
         iv = kwargs.get('iv')
-        nonce = kwargs.get('nonce')
+        nonce = iv
 
-        if iv is not None:
+        if self.mode in (self.MODE_CBC, self.MODE_CFB, self.MODE_OFB):
             cipher = AES.new(self.key, self.mode, iv=iv)
-        elif nonce is not None:
+            self.iv = cipher.IV
+        elif self.mode in (self.MODE_CTR, self.MODE_EAX):
             cipher = AES.new(self.key, self.mode, nonce=nonce)
+            self.iv = cipher.nonce
         else:
             cipher = AES.new(self.key, self.mode)
 
-        if self.mode in (self.MODE_CBC, self.MODE_CFB, self.MODE_OFB):
-            self.iv = cipher.IV
-        elif self.mode in (self.MODE_CTR, self.MODE_EAX):
-            self.nonce = cipher.nonce
-
         if self.mode == self.MODE_EAX:
-            enc, tag = cipher.encrypt_and_digest(message)
-            return enc + tag
+            enc, mac = cipher.encrypt_and_digest(message)
+            return enc + mac
 
         return cipher.encrypt(message)
 
@@ -101,24 +91,18 @@ class AES256Encryption(EncryptionInterface):
                 will change the default mode that may have been
                 provided in the constructor
         *    *iv* (``byte string``) --
-                initialization vector (for CBC, CFB and OFB modes) - 16 bytes long
-        *    *nonce* (``byte string``) --
-                a value that must not be repeated with this key
-                required for CTR and EAX modes
-                length must be in **[0..15]**, recommended **8**
+                initialization vector - should not be repeated - 16 bytes long
         """
         mode = kwargs.get('mode')
         if mode is not None:
             self.mode = mode
 
-        nonce = kwargs.get('nonce')
-
-        if iv is not None:
+        if self.mode in (self.MODE_CBC, self.MODE_CFB, self.MODE_OFB):
             cipher = AES.new(self.key, self.mode, iv=iv)
             self.iv = cipher.IV
-        elif nonce is not None:
-            cipher = AES.new(self.key, self.mode, nonce=nonce)
-            self.nonce = cipher.nonce
+        elif self.mode in (self.MODE_CTR, self.MODE_EAX):
+            cipher = AES.new(self.key, self.mode, nonce=iv)
+            self.iv = cipher.nonce
         else:
             cipher = AES.new(self.key, self.mode)
 

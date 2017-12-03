@@ -8,20 +8,20 @@ from ..security.encryption import AES256Encryption, Key
 
 _logger = logging.getLogger('file_encryption')
 
-def encrypt_file(path: str, key: Key, nonce: bytes = None) -> bytes:
+def encrypt_file(path: str, key: Key, iv: bytes = None) -> bytes:
     """
     Encrypts a file using AES-256 CTR mode
     :param path: the path to the file to encrypt
     :param key: the key to encrypt the file with
-    :param nonce: the nonce (iv) to encrypt the file with (if None, one will be generated)
-    :return: the nonce used in the encryption
+    :param iv: the iv to encrypt the file with (if None, one will be generated)
+    :return: the iv used in the encryption
     """
     with open(path, 'rb') as f:
         data = f.read()
 
     cipher = AES256Encryption(key, AES256Encryption.MODE_EAX)
-    encrypted = cipher.encrypt(data, nonce=nonce)
-    log_encryption_start(path, cipher.nonce, cipher)
+    encrypted = cipher.encrypt(data, iv=iv)
+    log_encryption_start(path)
 
     if not os.path.isdir(BACKUP_DIR):
         os.makedirs(BACKUP_DIR, 0o600, exist_ok=True)
@@ -33,21 +33,21 @@ def encrypt_file(path: str, key: Key, nonce: bytes = None) -> bytes:
     os.remove(os.path.join(BACKUP_DIR, os.path.basename(path)))
     log_encryption_end(path)
 
-    return cipher.nonce
+    return cipher.iv
 
 
-def decrypt_file(path: str, key: Key, nonce: bytes) -> None:
+def decrypt_file(path: str, key: Key, iv: bytes) -> None:
     """
     Decrypts a file using AES-256 CTR mode
     :param path: the path to the file to decrypt
     :param key: the key to decrypt the file with
-    :return: the nonce that was used to encrypt the file with
+    :param iv: the iv that was used to encrypt the file with
     """
     with open(path, 'rb') as f:
         data = f.read()
 
     cipher = AES256Encryption(key, AES256Encryption.MODE_EAX)
-    decrypted = cipher.decrypt(data, nonce=nonce)
+    decrypted = cipher.decrypt(data, iv=iv)
     log_decryption_start(path)
 
     if not os.path.isdir(BACKUP_DIR):
@@ -85,10 +85,10 @@ def encrypt_all(files: Dict[str, bytes], key: Key) -> None:
         if status == 'decrypted':
             encrypt_file(path, key, files[path])
 
-    for path, nonce in files.items():
+    for path, iv in files.items():
         if path in file_status:
             continue  # We've already handled it
-        encrypt_file(path, key, nonce)
+        encrypt_file(path, key, iv)
     clear_log()
 
 
@@ -99,5 +99,5 @@ def decrypt_all(files: Dict[str, bytes], key: Key) -> None:
     :param files: dictionary mapping file paths to their encryption IVs
     :param key: the key to decrypt the files with
     """
-    for path, nonce in files.items():
-        decrypt_file(path, key, nonce)
+    for path, iv in files.items():
+        decrypt_file(path, key, iv)

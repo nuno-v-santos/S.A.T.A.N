@@ -8,6 +8,7 @@ from ..security import keys
 
 class EncryptionTestCase(unittest.TestCase):
     TEST_STRING = b'RivestShamirAdleman'
+    TEST_IV = b'Super Secret IV!'
 
     def setUp(self):
         key_manager = keys.AES256KeyManager()
@@ -18,12 +19,12 @@ class EncryptionTestCase(unittest.TestCase):
         os.write(fd, self.TEST_STRING)
         os.close(fd)
 
-        nonce = encrypt_file(path, self.key)
+        encrypt_file(path, self.key, self.TEST_IV)
 
         with open(path, 'rb') as f:
             self.assertNotEqual(self.TEST_STRING, f.read())
 
-        decrypt_file(path, self.key, nonce)
+        decrypt_file(path, self.key, self.TEST_IV)
 
         with open(path, 'rb') as f:
             self.assertEqual(self.TEST_STRING, f.read())

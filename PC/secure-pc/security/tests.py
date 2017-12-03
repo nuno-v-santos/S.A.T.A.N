@@ -61,7 +61,7 @@ class AES256TestCase(unittest.TestCase):
         original = TEST_STRING1
         encrypted = self.cipher.encrypt(original, mode=self.cipher.MODE_EAX)
         self.assertNotEqual(original, encrypted)
-        decrypted = self.cipher.decrypt(encrypted, nonce=self.cipher.nonce)
+        decrypted = self.cipher.decrypt(encrypted, iv=self.cipher.iv)
         self.assertEqual(original, decrypted)
 
     def test_eax_tampered(self):
@@ -69,7 +69,7 @@ class AES256TestCase(unittest.TestCase):
         encrypted = self.cipher.encrypt(original, mode=self.cipher.MODE_EAX)
         encrypted = encrypted[:4] + bytes([(encrypted[5] + 1) % 255]) + encrypted[6:]
         try:
-            self.cipher.decrypt(encrypted, nonce=self.cipher.nonce)
+            self.cipher.decrypt(encrypted, iv=self.cipher.iv)
         except:
             return
         self.fail("Decrypt method did not throw an exception")
