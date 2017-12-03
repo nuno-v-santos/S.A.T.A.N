@@ -97,11 +97,25 @@ public class KeyExchangeActivity extends AppCompatActivity {
 
             btCommunication.sendMessage(encryptedDEKMEK);
 
+            // DEK[TEK] Dispatch
+            statusTV.setText(R.string.send_dek);
+            progressBar.setProgress(75);
+            random.nextBytes(ivTEK);
+            encryptedDEK = encryption.AESencrypt(DEK.getEncoded(), TEK, "CBC", ivTEK);
+
+            // iv || DEK[TEK]
+            baos = new ByteArrayOutputStream();
+            baos.write(ivTEK);
+            baos.write(encryptedDEK);
+            encryptedDEK = baos.toByteArray();
+
+            btCommunication.sendMessage(encryptedDEK);
+
             btCommunication.close();
 
             // Key store
             statusTV.setText(R.string.key_storing);
-            progressBar.setProgress(75);
+            progressBar.setProgress(90);
             km.storeKey(this, publicKey, Constants.ANDROID_PUBLIC_KEY_ID, password);
             km.storeKey(this, privateKey, Constants.ANDROID_PRIVATE_KEY_ID, password);
             km.storeKey(this, MEK, Constants.ANDROID_MEK_ID, password);
@@ -116,7 +130,7 @@ public class KeyExchangeActivity extends AppCompatActivity {
         // Store computer object in device filesystem
         try {
             statusTV.setText(R.string.computer_storing);
-            progressBar.setProgress(90);
+            progressBar.setProgress(95);
             ObjectOutputStream oos = new ObjectOutputStream(this.openFileOutput(Constants.COMPUTER_OBJ_FILENAME, this.MODE_PRIVATE));
             oos.writeObject(computer);
             oos.close();
