@@ -107,7 +107,9 @@ class AES256Encryption(EncryptionInterface):
             cipher = AES.new(self.key, self.mode)
 
         if self.mode == self.MODE_EAX:
-            plaintext = cipher.decrypt_and_verify(message[:-16], message[-16:])
+            mac = message[-16:]
+            message = message[:-16]
+            plaintext = cipher.decrypt_and_verify(message, mac)
         else:
             plaintext = cipher.decrypt(message)
 
