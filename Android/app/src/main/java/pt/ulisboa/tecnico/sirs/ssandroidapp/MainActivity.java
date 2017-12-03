@@ -26,11 +26,22 @@ public class MainActivity extends AppCompatActivity {
             b.setVisibility(View.VISIBLE);
             b = findViewById(R.id.unpairButton);
             b.setVisibility(View.VISIBLE);
+
+            if (getIntent().getStringExtra(Constants.PASSWORD_ID) != null)  // if unpair was called
+                unpair();
         }
         else tv.setText(R.string.no_current_computer);
     }
 
     public void changeActivity2BluetoothPair(View view) {
+        if (computer != null) { // if android is already paired, ask user the computer password before making a new pair
+            Intent intent = new Intent(this, PasswordVerifyActivity.class);
+            String nextClassName = PasswordRequestActivity.class.getName();
+            intent.putExtra(Constants.NEXT_CLASS_ID, nextClassName);
+            intent.putExtra(Constants.COMPUTER_OBJ, computer);
+            startActivity(intent);
+            return;
+        }
         Intent intent = new Intent(this, PasswordRequestActivity.class);
         startActivity(intent);
     }
@@ -56,11 +67,20 @@ public class MainActivity extends AppCompatActivity {
 
     public void changeActivity2Connection(View view){
         Intent intent = new Intent(this, PasswordVerifyActivity.class);
+        String nextClassName = ConnectionActivity.class.getName();
+        intent.putExtra(Constants.NEXT_CLASS_ID, nextClassName);
         intent.putExtra(Constants.COMPUTER_OBJ, computer);
         startActivity(intent);
     }
 
     public void unpair(View view) {
+        Intent intent = new Intent(this, PasswordVerifyActivity.class); // asks user the computer password if you want to unpair
+        String nextClassName = MainActivity.class.getName(); // next activity after password verify is a main with a password on the intent
+        intent.putExtra(Constants.NEXT_CLASS_ID, nextClassName);
+        startActivity(intent);
+    }
+
+    private void unpair() {
         this.deleteFile(Constants.COMPUTER_OBJ_FILENAME);
 
         // hides ui related to computer
@@ -71,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView tv = findViewById(R.id.deviceNameTV);
         tv.setText(R.string.no_current_computer);
+        computer = null;
     }
 
 }

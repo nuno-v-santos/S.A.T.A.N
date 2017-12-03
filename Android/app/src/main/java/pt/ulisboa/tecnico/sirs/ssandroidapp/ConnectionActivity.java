@@ -23,7 +23,6 @@ import static android.os.SystemClock.sleep;
 public class ConnectionActivity extends AppCompatActivity {
     BluetoothAdapter btAdapter;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,14 +65,14 @@ public class ConnectionActivity extends AppCompatActivity {
         try {
             // TEK Establishment
             statusView.setText(R.string.tek_establishment);
-            byte[] encryptedTEK = bComm.receiveMessage();
+            byte[] encryptedTEK = bComm.receiveMessage(256); // FIXME this receive can get both computer messages
             Key privateKey = km.loadKey(this, Constants.ANDROID_PRIVATE_KEY_ID, password);
             byte[] encodedTEK = en.RSAdecrypt(encryptedTEK, privateKey);
             Key TEK = km.createSymmetricKey(encodedTEK);
 
             // Receive DEK(MEK) from Computer
             statusView.setText(R.string.wait_dek_mek);
-            byte[] encryptedDEKMEK = bComm.receiveMessage();
+            byte[] encryptedDEKMEK = bComm.receiveMessage(80);
             byte[] encryptedDEKMEKiv = Arrays.copyOfRange(encryptedDEKMEK, 0, 16);
             encryptedDEKMEK = Arrays.copyOfRange(encryptedDEKMEK, 16, encryptedDEKMEK.length);
             byte[] encodedDEKMEK = en.AESdecrypt(encryptedDEKMEK, TEK, "CBC", encryptedDEKMEKiv);
@@ -96,8 +95,12 @@ public class ConnectionActivity extends AppCompatActivity {
             bComm.sendMessage(encryptedDEK);
 
             // heartbeat
-            // TODO HEARTBEATS
-
+            statusView.setText(R.string.pinging_computer);
+            MyApplication app = (MyApplication) getApplicationContext();
+            app.setCommunicationInterface(bComm);
+            Intent intent = new Intent(this, HeartbeatService.class);
+            HeartbeatService.TEK = TEK;
+            startService(intent);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,6 +137,7 @@ public class ConnectionActivity extends AppCompatActivity {
     }
 
     public void connectionDone(View view) {
+        HeartbeatService.shouldContinue = false;
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }

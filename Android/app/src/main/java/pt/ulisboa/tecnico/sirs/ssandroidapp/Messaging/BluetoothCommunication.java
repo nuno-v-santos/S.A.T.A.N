@@ -43,23 +43,21 @@ public class BluetoothCommunication implements CommunicationInterface{
     }
 
     @Override
-    public void sendMessage(byte[] message) {
-        try {
-            btSocket.getOutputStream().write(message);
-        } catch (IOException e) {
-            Log.d("Failed_Write", "Could not write to socket.");
-        }
-
+    public void sendMessage(byte[] message) throws IOException {
+        btSocket.getOutputStream().write(message);
     }
 
     @Override
-    public byte[] receiveMessage() {
+    public byte[] receiveMessage() throws IOException {
         byte[] buffer = new byte[Constants.RECEIVER_BUFFER_SIZE];
-        try {
-            int bytes = btSocket.getInputStream().read(buffer);
-        } catch (IOException e) {
-            Log.d("Failed_Read", "Could not read from socket.");
-        }
+        int bytes = btSocket.getInputStream().read(buffer);
+        return buffer;
+    }
+
+    @Override
+    public byte[] receiveMessage(int size) throws IOException {
+        byte[] buffer = new byte[size];
+        int bytes = btSocket.getInputStream().read(buffer);
         return buffer;
     }
 

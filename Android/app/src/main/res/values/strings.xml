@@ -25,4 +25,7 @@
     <string name="bluetooth_connection_status">Establishing bluetooth connection with paired Computer.</string>
     <string name="wait_dek_mek">Waiting for Computer encrypted DEK.</string>
     <string name="send_dek">Sending decrypted DEK to Computer.</string>
+    <string name="heartbeat_error">Error: Heartbeat error, interrupting communication.</string>
+    <string name="pinging_computer">Pinging computer.</string>
+    <string name="password_mismatch">Inserted passwords are different from each other.</string>
 </resources>
