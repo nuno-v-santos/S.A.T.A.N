@@ -82,3 +82,8 @@ def encrypt_all(files: Dict[str, bytes], key: Key):
             continue  # We've already handled it
         encrypt_file(path, key, nonce)
     clear_log()
+
+
+def decrypt_all(files: Dict[str, bytes], key: Key):
+    for path, nonce in files.items():
+        decrypt_file(path, key, nonce)
