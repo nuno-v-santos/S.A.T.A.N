@@ -1,6 +1,7 @@
 import logging
 import threading
 from .constants import LOG_PATH
+from typing import Dict, NamedTuple
 
 
 logger = logging.getLogger('tolerance')
@@ -23,15 +24,13 @@ def synchronized(lock: threading.Lock):
 
 
 @synchronized(mutex)
-def log_encryption_start(path: str, nonce: bytes):
-    logger.debug('Encrypting {path} with nonce {nonce}'.format(
+def log_encryption_start(path: str):
+    logger.debug('Encrypting {path}'.format(
         path=path,
-        nonce=nonce.hex(),
     ))
     with open(LOG_PATH, 'a') as log_file:
-        print("es:{path}:{nonce}".format(
+        print("es:{path}".format(
             path=path.encode('utf-8').hex(),
-            nonce=nonce.hex(),
         ), file=log_file)
 
 
@@ -60,3 +59,26 @@ def log_decryption_end(path: str):
         print("de:{path}".format(
             path=path.encode('utf-8').hex(),
         ), file=log_file)
+
+@synchronized(mutex)
+def get_file_status():
+    logger.debug('Fetching all currently decrypted files from the log')
+    file_status: Dict[str, str] = {}
+    with open(LOG_PATH, 'r') as log_file:
+        for line in log_file.readlines():
+            fields = line.split(':')
+            opcode = fields[0]
+            path = str(bytes.fromhex(fields[1]), 'utf-8')
+            if opcode == 'ds':
+                logging.debug("Found decryption-in-progress file at {}".format(path))
+                file_status[path] = 'decrypting'
+            elif opcode == 'de':
+                logging.debug("File at {} was decrypted")
+                file_status[path] = 'decrypted'
+            elif opcode == 'es':
+                logging.debug("Found encryption-in-progress file at {}".format(path))
+                file_status[path] = 'encrypting'
+            elif opcode == 'ee':
+                logging.debug("File at {} was encrypted".format(path))
+                file_status[path] = 'encrypted'
+    return file_status
