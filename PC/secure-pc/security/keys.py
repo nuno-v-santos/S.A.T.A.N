@@ -10,6 +10,9 @@ from .interfaces import AsymmetricKeyManagementInterface, SymmetricKeyManagement
 from .encryption import AES256Encryption
 
 
+RSAKey = RSA.RsaKey
+AESKey = bytes
+
 class RSAKeyManager(AsymmetricKeyManagementInterface):
     def __init__(self):
         self.logger = logging.getLogger('RSAKeyManager')
