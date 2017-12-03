@@ -31,9 +31,7 @@ class Model(object):
         self.local_cipher = aes_cipher
         
         encrypted_password_check = aes_cipher.encrypt(constants.PASSWORD_CHECK_STRING)
-        iv = aes_cipher.iv
         with open(constants.PASSWORD_CHECK_PATH, 'wb') as f:
-            f.write(iv)
             f.write(encrypted_password_check)
 
     def validate_password(self, password: str) -> bool:
@@ -48,11 +46,10 @@ class Model(object):
         key = aes_key_manager.create_key(password.encode('utf-8'))
         aes_cipher = AES256Encryption(key, mode=AES256Encryption.MODE_EAX)
         with open(constants.PASSWORD_CHECK_PATH, 'rb') as f:
-            iv = f.read(16)
             ciphered_string = f.read()
         try:
-            aes_cipher.decrypt(ciphered_string, iv=iv)
-        except: # File has been tampered with or key is incorrect FIXME
+            assert aes_cipher.decrypt(ciphered_string) == constants.PASSWORD_CHECK_STRING
+        except: # File has been tampered with or password is incorrect
             return False
 
         self.local_cipher = aes_cipher
