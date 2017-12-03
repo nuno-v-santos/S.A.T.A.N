@@ -5,16 +5,16 @@ from security.keys import Key, KeyPair, AES256KeyManager
 
 class Model(object):
     def __init__(self):
-        self.files: Dict[str, bytes] = {}
-        self.phone_name: str = ''
-        self.phone_address: str = ''
+        self.files = []
+        self.phone_name = ''
+        self.phone_address = ''
 
-        self.local_cipher: AES256Encryption = None
+        self.local_cipher = None
 
-        self.phone_public_key: Key = None
-        self.computer_key_pair: KeyPair = None
-        self.file_encryption_key: Key = None
-        self.session_key: Key = None
+        self.phone_public_key = None
+        self.computer_key_pair = None
+        self.file_encryption_key = None
+        self.session_key = None
 
     def define_password(self, password: str) -> None:
         """
