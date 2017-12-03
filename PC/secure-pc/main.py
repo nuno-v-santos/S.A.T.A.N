@@ -1,6 +1,7 @@
 import logging
 import qrcode
 import time
+import io
 
 from messaging.communication import BluetoothCommunication, SecureCommunication
 from security.keys import RSAKeyManager, AES256KeyManager, RSA
@@ -34,6 +35,8 @@ def main():
         logging.debug("Receiving and decrypting phone's public key")
         phone_key = secure_interface.receive(480) # Receive IV | phone_public[TEK]
         logging.debug("Phone key is {}".format(phone_key))
+        with io.BytesIO(phone_key) as f:
+            phone_key = RSAKeyManager().load_key(f)
 
         logging.debug("Receiving and decrypting Disk Encryption Key (encrypted by Master Encryption Key)")
         disk_key_mek = secure_interface.receive(80) # receive IV | DEK(MEK)[TEK]
