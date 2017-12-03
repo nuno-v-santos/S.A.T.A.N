@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import NamedTuple, Union
+from typing import NamedTuple, Union, IO, AnyStr
 
 from Cryptodome.PublicKey.RSA import RsaKey
 
@@ -30,26 +30,27 @@ class EncryptionInterface(metaclass=ABCMeta):
 class KeyManagementInterface(metaclass=ABCMeta):
     """
     Abstract interface for managing storage
-    and retrial of cryptographic keys.
+    and retrieval of cryptographic keys.
     """
     @abstractmethod
-    def load_key(self, path: str, password: str = None) -> Key:
+    def load_key(self, file: Union[str, IO[AnyStr]], password: str = None) -> Key:
         """
         Load a key from the filesystem
-        :param path: path for the key file
+
+        :param file: if str, path for the key file; else, a stream to read the key from
         :param password: password protecting the file (optional)
         :return: the key
         """
         raise NotImplementedError
 
     @abstractmethod
-    def store_key(self, key: Key, path: str, password: str = None) -> Key:
+    def store_key(self, key: Key, file: Union[str, IO[AnyStr]], password: str = None) -> None:
         """
         Write a key to a file
+
         :param key: key to write
-        :param path: path to write the file to
+        :param file: if str, path to write the file to; else, a stream to write the file in
         :param password: password to protect the file (optional)
-        :return:
         """
         raise NotImplementedError
 
@@ -63,27 +64,30 @@ class AsymmetricKeyManagementInterface(KeyManagementInterface):
     def create_key_pair(self, size: int) -> KeyPair:
         """
         Create a public-private key pair
+
         :param size: size of the keys (in bits)
         :return: the key pair
         """
         raise NotImplementedError
 
     @abstractmethod
-    def load_key_pair(self, path: str, password: str = None) -> KeyPair:
+    def load_key_pair(self, file: Union[str, IO[AnyStr]], password: str = None) -> KeyPair:
         """
         Load a key pair from the filesystem
-        :param path: path for the key pair file
+
+        :param file: if str, path for the key pair file; else, a stream to read the key pair from
         :param password: password protecting the file (optional)
         :return: the key pair
         """
         raise NotImplementedError
 
     @abstractmethod
-    def store_key_pair(self, key_pair: KeyPair, path: str, password: str = None) -> None:
+    def store_key_pair(self, key_pair: KeyPair, file: Union[str, IO[AnyStr]], password: str = None) -> None:
         """
         Write a key pair to a file
+
         :param key_pair: key pair to write
-        :param path: path to write the file to
+        :param file: if str, path to write the file to; else, a stream to write the key pair into
         :param password: password to protect the file (optional)
         :return:
         """
