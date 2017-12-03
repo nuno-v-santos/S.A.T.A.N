@@ -88,7 +88,7 @@ def main():
             logging.debug("Received int: {}".format(int.from_bytes(heartbeat)))
             if heartbeat in nonces:
                 logging.debug("*gasp* This number was used more than once!")
-            set.add(heartbeat)
+            nonces.add(heartbeat)
 
 if __name__ == '__main__':
     main()
