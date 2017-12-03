@@ -27,4 +27,7 @@ public class Constants {
     public static final String ANDROID_MEK_ID = "pt.ulisboa.tecnico.sirs.ssandroidapp.MEK";
     public static final String ANDROID_MEK_IV_ID = "pt.ulisboa.tecnico.sirs.ssandroidapp.MEKiv";
     public static final int BLUETOOTH_CONNECTION_TRIES = 3;
+    public static final String BLUETOOTH_DEVICE_ID = "pt.ulisboa.tecnico.sirs.ssandroidapp.bluetoothDevice";
+    public static final int HEARTBEAT_DELAY = 30000;
+    public static final String NEXT_CLASS_ID = "pt.ulisboa.tecnico.sirs.ssandroidapp.nextClass";
 }

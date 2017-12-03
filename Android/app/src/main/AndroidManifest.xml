@@ -26,7 +26,11 @@
         <activity android:name=".BluetoothActivity" />
         <activity android:name=".KeyExchangeActivity" />
         <activity android:name=".PasswordVerifyActivity" />
-        <activity android:name=".ConnectionActivity"></activity>
+        <activity android:name=".ConnectionActivity" />
+
+        <service
+            android:name=".HeartbeatService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
