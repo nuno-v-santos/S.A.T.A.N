@@ -36,23 +36,28 @@ class AES256Encryption(EncryptionInterface):
         """
         self.key = key
         self.mode = mode
-        self.iv = None
 
     def encrypt(self, message: bytes, **kwargs) -> bytes:
         """
         Encrypt the message using AES-256. The message is padded
         using PKCS7.
+
+        The IV will be in the first 16 bytes of the returned data;
+        the remaining bytes will contain the ciphertext.
+
         If using EAX mode, the verification MAC will be appended to
         the data.
+
         :Keyword Arguments:
-        *    *mode* (``int``) --
+
+        *    **mode** (``int``) --
                 mode of operation for encryption
                 will change the default mode that may have been
                 provided in the constructor
-        *    *iv* (``byte string``) --
+        *    **iv** (``byte string``) --
                 initialization vector - should not be repeated - 16 bytes long
                 if not provided but required, a random IV is
-                generated and stored as a class member
+                generated.
         """
 
         message = pad(message, AES.block_size)
@@ -62,30 +67,37 @@ class AES256Encryption(EncryptionInterface):
             self.mode = mode
 
         iv = kwargs.get('iv')
-        nonce = iv
 
         if self.mode in (self.MODE_CBC, self.MODE_CFB, self.MODE_OFB):
             cipher = AES.new(self.key, self.mode, iv=iv)
-            self.iv = cipher.IV
+            iv = cipher.iv
         elif self.mode in (self.MODE_CTR, self.MODE_EAX):
-            cipher = AES.new(self.key, self.mode, nonce=nonce)
-            self.iv = cipher.nonce
+            cipher = AES.new(self.key, self.mode, nonce=iv)
+            iv = cipher.nonce
         else:
             cipher = AES.new(self.key, self.mode)
+            iv = b''
 
         if self.mode == self.MODE_EAX:
             enc, mac = cipher.encrypt_and_digest(message)
-            return enc + mac
+            ciphertext = enc + mac
+        else:
+            ciphertext = cipher.encrypt(message)
 
-        return cipher.encrypt(message)
+        return iv + ciphertext
 
-    def decrypt(self, message: bytes, iv: bytes = None, *args, **kwargs) -> bytes:
+    def decrypt(self, message: bytes, *args, **kwargs) -> bytes:
         """
         Decrypt a message using AES-256. Message is assumed
         to be padded using PKCS7.
+
+        IV, if required but not provided, is assumed to be in the first 16 bytes of the message.
+
         If using EAX mode, the verification MAC is assumed to be
         appended to the data.
+
         :Keyword Arguments:
+
         *    *mode* (``int``) --
                 mode of operation for encryption
                 will change the default mode that may have been
@@ -97,12 +109,15 @@ class AES256Encryption(EncryptionInterface):
         if mode is not None:
             self.mode = mode
 
+        iv = kwargs.get('iv')
+        if iv is None and self.mode != self.MODE_ECB:
+            iv = message[:16]
+            message = message[16:]
+
         if self.mode in (self.MODE_CBC, self.MODE_CFB, self.MODE_OFB):
             cipher = AES.new(self.key, self.mode, iv=iv)
-            self.iv = cipher.IV
         elif self.mode in (self.MODE_CTR, self.MODE_EAX):
             cipher = AES.new(self.key, self.mode, nonce=iv)
-            self.iv = cipher.nonce
         else:
             cipher = AES.new(self.key, self.mode)
 
