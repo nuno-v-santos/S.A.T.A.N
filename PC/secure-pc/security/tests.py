@@ -44,6 +44,8 @@ class RSATestCase(unittest.TestCase):
         self.key_manager.store_key(self.key_pair.private_key, path)
         loaded_key = self.key_manager.load_key(path)
 
+        os.remove(path)
+
         self.assertEqual(self.key_pair.private_key, loaded_key)
 
     def test_save_and_load_key_file_password(self):
@@ -52,6 +54,8 @@ class RSATestCase(unittest.TestCase):
 
         self.key_manager.store_key(self.key_pair.private_key, path, TEST_PASSWORD)
         loaded_key = self.key_manager.load_key(path, TEST_PASSWORD)
+
+        os.remove(path)
 
         self.assertEqual(self.key_pair.private_key, loaded_key)
 
@@ -125,6 +129,8 @@ class AES256TestCase(unittest.TestCase):
         self.key_manager.store_key(self.key, path)
         loaded_key = self.key_manager.load_key(path)
 
+        os.remove(path)
+
         self.assertEqual(self.key, loaded_key)
 
     def test_save_and_load_key_file_password(self):
@@ -133,6 +139,8 @@ class AES256TestCase(unittest.TestCase):
 
         self.key_manager.store_key(self.key, path, TEST_PASSWORD)
         loaded_key = self.key_manager.load_key(path, TEST_PASSWORD)
+
+        os.remove(path)
 
         self.assertEqual(self.key, loaded_key)
 
