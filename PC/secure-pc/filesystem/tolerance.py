@@ -92,5 +92,8 @@ def get_file_status() -> Dict[str, str]:
     return file_status
 
 @synchronized(mutex)
-def clear_log():
+def clear_log() -> None:
+    """
+    Delete the log file
+    """
     os.remove(LOG_PATH)
