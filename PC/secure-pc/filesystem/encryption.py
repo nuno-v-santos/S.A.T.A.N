@@ -1,23 +1,26 @@
 import os
 import shutil
+import logging
 
 from .constants import BACKUP_DIR
 from .tolerance import *
 from ..security.encryption import AES256Encryption, Key
 
+_logger = logging.getLogger('file_encryption')
 
-def encrypt_file(path: str, key: Key) -> bytes:
+def encrypt_file(path: str, key: Key, nonce: bytes = None) -> bytes:
     """
     Encrypts a file using AES-256 CTR mode
     :param path: the path to the file to encrypt
     :param key: the key to encrypt the file with
+    :param nonce: the nonce (iv) to encrypt the file with (if None, one will be generated)
     :return: the nonce used in the encryption
     """
     with open(path, 'rb') as f:
         data = f.read()
 
     cipher = AES256Encryption(key, AES256Encryption.MODE_EAX)
-    encrypted = cipher.encrypt(data)
+    encrypted = cipher.encrypt(data, nonce=nonce)
     log_encryption_start(path, cipher.nonce, cipher)
 
     if not os.path.isdir(BACKUP_DIR):
@@ -56,3 +59,26 @@ def decrypt_file(path: str, key: Key, nonce: bytes) -> None:
 
     os.remove(os.path.join(BACKUP_DIR, os.path.basename(path)))
     log_decryption_end(path)
+
+
+def encrypt_all(files: Dict[str, bytes], key: Key):
+    file_status = get_file_status()
+    for path, status in file_status.items():
+        backup = os.path.join(BACKUP_DIR, os.path.basename(path))
+        if path not in files:  # Maybe some voodoo magic happened and we no longer care about this file
+            if os.path.isfile(backup):
+                os.remove(backup)  # We don't want to have a backup we don't need
+            continue
+        if status in ('encrypting', 'decrypting'):
+            if os.path.isfile(backup):
+                _logger.debug('Restoring {} from backup'.format(path))
+                shutil.copy2(backup, path)
+                status = 'decrypted'
+        if status == 'decrypted':
+            encrypt_file(path, key, files[path])
+
+    for path, nonce in files.items():
+        if path in file_status:
+            continue  # We've already handled it
+        encrypt_file(path, key, nonce)
+    clear_log()
