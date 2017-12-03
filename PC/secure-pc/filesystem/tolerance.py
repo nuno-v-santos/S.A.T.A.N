@@ -62,8 +62,12 @@ def log_decryption_end(path: str):
         ), file=log_file)
 
 @synchronized(mutex)
-def get_file_status():
-    logger.debug('Fetching all currently decrypted files from the log')
+def get_file_status() -> Dict[str, str]:
+    """
+    Get the current encryption status of all
+    logged files
+    :return: a dictionary mapping file paths to encryption status (encrypting, encrypted, decrypting, decrypted)
+    """
     _logger.debug('Fetching all currently decrypted files from the log')
     file_status: Dict[str, str] = {}
     with open(LOG_PATH, 'r') as log_file:
