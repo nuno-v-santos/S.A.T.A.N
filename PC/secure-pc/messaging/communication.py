@@ -95,11 +95,11 @@ class SecureCommunication(CommunicationInterface):
         :param key: the asymmetric key to use in the initial pairing
         :param generate: if True, this object is responsible for generating the session key
         """
-        self.communication: CommunicationInterface = communication
-        self.generate: bool = generate
+        self.communication = communication
+        self.generate = generate
 
-        self.symmetric_cipher: AES256Encryption = None
-        self.asymmetric_cipher: RSAEncryption = RSAEncryption(key)
+        self.symmetric_cipher = None
+        self.asymmetric_cipher = RSAEncryption(key)
 
     @property
     def asymmetric_key(self) -> RSAKey:
