@@ -61,7 +61,15 @@ def decrypt_file(path: str, key: Key, nonce: bytes) -> None:
     log_decryption_end(path)
 
 
-def encrypt_all(files: Dict[str, bytes], key: Key):
+def encrypt_all(files: Dict[str, bytes], key: Key) -> None:
+    """
+    Encrypts all files that need to be encrypted, even those
+    that may have remained decrypted and are logged.
+    Log is cleared once this function returns successfully.
+
+    :param files: a dictionary mapping file paths to their encryption IVs
+    :param key: the key to encrypt the files with
+    """
     file_status = get_file_status()
     for path, status in file_status.items():
         backup = os.path.join(BACKUP_DIR, os.path.basename(path))
@@ -84,6 +92,12 @@ def encrypt_all(files: Dict[str, bytes], key: Key):
     clear_log()
 
 
-def decrypt_all(files: Dict[str, bytes], key: Key):
+def decrypt_all(files: Dict[str, bytes], key: Key) -> None:
+    """
+    Decrypts all files.
+
+    :param files: dictionary mapping file paths to their encryption IVs
+    :param key: the key to decrypt the files with
+    """
     for path, nonce in files.items():
         decrypt_file(path, key, nonce)
