@@ -35,7 +35,7 @@ def main():
         logging.debug("Phone key is {}".format(phone_key))
 
         logging.debug("Receiving Disk Encryption Key")
-        disk_key = bluetooth_interface.receive(80)
+        disk_key = bluetooth_interface.receive(64)
         logging.debug("Decrypting Disk Encryption Key")
         iv, disk_key = disk_key[:16], disk_key[16:]
         disk_key = aes_cipher.decrypt(disk_key, iv=iv)
