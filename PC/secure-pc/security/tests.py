@@ -1,9 +1,15 @@
 import unittest
+import tempfile
+import os
+import io
+
 from .encryption import RSAEncryption, AES256Encryption
 from .keys import RSAKeyManager, AES256KeyManager
 
 TEST_STRING1 = b'SIRS is fun!'
 TEST_STRING2 = b'We <3 Security'
+
+TEST_PASSWORD = 'All play and no work makes Jack a happy boy'
 
 class RSATestCase(unittest.TestCase):
 
@@ -30,6 +36,44 @@ class RSATestCase(unittest.TestCase):
         self.assertNotEqual(original, encrypted)
         decrypted = self.private_key_cipher.decrypt(encrypted)
         self.assertEqual(original, decrypted)
+
+    def test_save_and_load_key_file_no_password(self):
+        fd, path = tempfile.mkstemp()
+        os.close(fd)
+
+        self.key_manager.store_key(self.key_pair.private_key, path)
+        loaded_key = self.key_manager.load_key(path)
+
+        self.assertEqual(self.key_pair.private_key, loaded_key)
+
+    def test_save_and_load_key_file_password(self):
+        fd, path = tempfile.mkstemp()
+        os.close(fd)
+
+        self.key_manager.store_key(self.key_pair.private_key, path, TEST_PASSWORD)
+        loaded_key = self.key_manager.load_key(path, TEST_PASSWORD)
+
+        self.assertEqual(self.key_pair.private_key, loaded_key)
+
+    def test_save_and_load_key_stream_no_password(self):
+        key = self.key_pair.public_key
+
+        with io.BytesIO() as file:
+            self.key_manager.store_key(key, file)
+            file.seek(0)
+            loaded_key = self.key_manager.load_key(file)
+
+        self.assertEqual(key, loaded_key)
+
+    def test_save_and_load_key_stream_password(self):
+        key = self.key_pair.public_key
+
+        with io.BytesIO() as file:
+            self.key_manager.store_key(key, file, TEST_PASSWORD)
+            file.seek(0)
+            loaded_key = self.key_manager.load_key(file, TEST_PASSWORD)
+
+        self.assertEqual(key, loaded_key)
 
 
 class AES256TestCase(unittest.TestCase):
@@ -73,6 +117,40 @@ class AES256TestCase(unittest.TestCase):
         except:
             return
         self.fail("Decrypt method did not throw an exception")
+
+    def test_save_and_load_key_file_no_password(self):
+        fd, path = tempfile.mkstemp()
+        os.close(fd)
+
+        self.key_manager.store_key(self.key, path)
+        loaded_key = self.key_manager.load_key(path)
+
+        self.assertEqual(self.key, loaded_key)
+
+    def test_save_and_load_key_file_password(self):
+        fd, path = tempfile.mkstemp()
+        os.close(fd)
+
+        self.key_manager.store_key(self.key, path, TEST_PASSWORD)
+        loaded_key = self.key_manager.load_key(path, TEST_PASSWORD)
+
+        self.assertEqual(self.key, loaded_key)
+
+    def test_save_and_load_key_stream_no_password(self):
+        with io.BytesIO() as file:
+            self.key_manager.store_key(self.key, file)
+            file.seek(0)
+            loaded_key = self.key_manager.load_key(file)
+
+        self.assertEqual(self.key, loaded_key)
+
+    def test_save_and_load_key_stream_password(self):
+        with io.BytesIO() as file:
+            self.key_manager.store_key(self.key, file, TEST_PASSWORD)
+            file.seek(0)
+            loaded_key = self.key_manager.load_key(file, TEST_PASSWORD)
+
+        self.assertEqual(self.key, loaded_key)
 
 
 if __name__ == '__main__':
