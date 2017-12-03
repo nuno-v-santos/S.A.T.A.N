@@ -16,11 +16,13 @@ import java.util.TimerTask;
 import pt.ulisboa.tecnico.sirs.ssandroidapp.Security.SecurePreferences;
 
 public class PasswordVerifyActivity extends AppCompatActivity { // Asks user a password and checks if it matches with the last inputed password
+    String nextClassName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_password);
+        nextClassName = getIntent().getStringExtra(Constants.NEXT_CLASS_ID);
     }
 
     public void verifyPassword(View view) {
@@ -61,10 +63,16 @@ public class PasswordVerifyActivity extends AppCompatActivity { // Asks user a p
             return;
         }
 
-        Intent intent = new Intent(this, ConnectionActivity.class);
+        try {
+            Class<?> nextActivity = Class.forName(nextClassName);
+            Intent intent = new Intent(this, nextActivity);
 
-        intent.putExtra(Constants.PASSWORD_ID, password);
-        intent.putExtra(Constants.COMPUTER_OBJ, getIntent().getSerializableExtra(Constants.COMPUTER_OBJ));
-        startActivity(intent);
+            intent.putExtra(Constants.PASSWORD_ID, password);
+            intent.putExtra(Constants.COMPUTER_OBJ, getIntent().getSerializableExtra(Constants.COMPUTER_OBJ));
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), R.string.error, Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
     }
 }
