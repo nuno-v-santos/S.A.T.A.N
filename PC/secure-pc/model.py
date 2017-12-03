@@ -84,3 +84,15 @@ class Model(object):
 
         self.files = files_list
         return files_list
+
+    def save_files_list(self) -> None:
+        if self.local_cipher is None:
+            raise NoPasswordError("No valid password has been inputted yet")
+
+        with io.StringIO() as f:
+            yaml.dump(self.files, f)
+            files_list = f.getvalue()
+
+        encrypted_files_list = self.local_cipher.encrypt(files_list.encode('utf-8'))
+        with open(constants.FILES_LIST_PATH, 'wb') as f:
+            f.write(encrypted_files_list)
