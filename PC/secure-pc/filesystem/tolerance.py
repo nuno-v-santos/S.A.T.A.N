@@ -1,7 +1,7 @@
 import os
 import logging
 import threading
-from .constants import LOG_PATH
+from .constants import LOG_PATH, LOG_DIR
 from typing import Dict, NamedTuple
 
 
@@ -24,7 +24,23 @@ def synchronized(lock: threading.Lock):
     return wrap
 
 
+def ensure_log_exists(f):
+    """
+    Decorator to ensure the log directory exists before
+    logging
+
+    :return: the decorated function
+    """
+    def log_function(*args, **kwargs):
+        if not os.path.isdir(LOG_DIR):
+            os.makedirs(LOG_DIR, 0o600, exist_ok=True)
+        f(*args, **kwargs)
+    return log_function
+
+
+
 @synchronized(mutex)
+@ensure_log_exists
 def log_encryption_start(path: str):
     _logger.debug('Encrypting {path}'.format(
         path=path,
@@ -36,6 +52,7 @@ def log_encryption_start(path: str):
 
 
 @synchronized(mutex)
+@ensure_log_exists
 def log_encryption_end(path: str):
     _logger.debug('Finished encrypting {}'.format(path))
     with open(LOG_PATH, 'a') as log_file:
@@ -45,6 +62,7 @@ def log_encryption_end(path: str):
 
 
 @synchronized(mutex)
+@ensure_log_exists
 def log_decryption_start(path: str):
     _logger.debug('Decrypting {}'.format(path))
     with open(LOG_PATH, 'a') as log_file:
@@ -54,6 +72,7 @@ def log_decryption_start(path: str):
 
 
 @synchronized(mutex)
+@ensure_log_exists
 def log_decryption_end(path: str):
     _logger.debug('Finished decrypting {}'.format(path))
     with open(LOG_PATH, 'a') as log_file:
