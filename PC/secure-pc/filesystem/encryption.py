@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from .constants import backup_dir
+from .constants import BACKUP_DIR
 from .tolerance import *
 from ..security.encryption import AES256Encryption, Key
 
@@ -18,16 +18,16 @@ def encrypt_file(path: str, key: Key) -> bytes:
 
     cipher = AES256Encryption(key, AES256Encryption.MODE_CTR)
     encrypted = cipher.encrypt(data)
-    log_encryption_start(path, cipher.nonce)
+    log_encryption_start(path, cipher.nonce, cipher)
 
-    if not os.path.isdir(backup_dir):
-        os.makedirs(backup_dir, 0o600, exist_ok=True)
-    shutil.copy2(path, backup_dir)
+    if not os.path.isdir(BACKUP_DIR):
+        os.makedirs(BACKUP_DIR, 0o600, exist_ok=True)
+    shutil.copy2(path, BACKUP_DIR)
 
     with open(path, 'wb') as f:
         f.write(encrypted)
 
-    os.remove(os.path.join(backup_dir, os.path.basename(path)))
+    os.remove(os.path.join(BACKUP_DIR, os.path.basename(path)))
     log_encryption_end(path)
 
     return cipher.nonce
@@ -47,12 +47,12 @@ def decrypt_file(path: str, key: Key, nonce: bytes) -> None:
     decrypted = cipher.decrypt(data, nonce=nonce)
     log_decryption_start(path)
 
-    if not os.path.isdir(backup_dir):
-        os.makedirs(backup_dir, 0o600, exist_ok=True)
-    shutil.copy2(path, backup_dir)
+    if not os.path.isdir(BACKUP_DIR):
+        os.makedirs(BACKUP_DIR, 0o600, exist_ok=True)
+    shutil.copy2(path, BACKUP_DIR)
 
     with open(path, 'wb') as f:
         f.write(decrypted)
 
-    os.remove(os.path.join(backup_dir, os.path.basename(path)))
+    os.remove(os.path.join(BACKUP_DIR, os.path.basename(path)))
     log_decryption_end(path)
