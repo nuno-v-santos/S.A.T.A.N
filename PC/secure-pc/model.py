@@ -1,7 +1,12 @@
+import io
+import os
+import yaml
+import logging
 import constants
-from typing import Dict
+from typing import List
 from security.encryption import AES256Encryption
 from security.keys import Key, KeyPair, AES256KeyManager
+from exceptions import NoPasswordError
 
 class Model(object):
     def __init__(self):
@@ -55,3 +60,27 @@ class Model(object):
         self.local_cipher = aes_cipher
         return True
 
+    def load_files_list(self) -> List[str]:
+        """
+        Loads the encrypted files list from the given path.
+        :param path:
+        :return:
+        """
+        if self.local_cipher is None:
+            raise NoPasswordError("No valid password has been inputted yet")
+        if not os.path.isfile(constants.FILES_LIST_PATH):
+            self.files = {}
+            return []
+
+        with open(constants.FILES_LIST_PATH, 'rb') as f:
+            encrypted_files_list = f.read()
+        decrypted_files_list = self.local_cipher.decrypt(encrypted_files_list)
+
+        with io.StringIO(str(decrypted_files_list, 'utf-8')) as s:
+            files_list = yaml.load(s)
+
+        logger = logging.getLogger("model")
+        logger.debug("Loaded files list is {}".format(files_list))
+
+        self.files = files_list
+        return files_list
