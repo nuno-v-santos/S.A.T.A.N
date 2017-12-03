@@ -6,8 +6,8 @@ from Cryptodome.Random import get_random_bytes
 
 from typing import Union, IO, AnyStr
 
-from .interfaces import AsymmetricKeyManagementInterface, SymmetricKeyManagementInterface, KeyPair, Key
-from .encryption import AES256Encryption
+from securepc.security.interfaces import AsymmetricKeyManagementInterface, SymmetricKeyManagementInterface, KeyPair, Key
+from securepc.security.encryption import AES256Encryption
 
 
 RSAKey = RSA.RsaKey

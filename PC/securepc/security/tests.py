@@ -3,8 +3,8 @@ import tempfile
 import os
 import io
 
-from .encryption import RSAEncryption, AES256Encryption
-from .keys import RSAKeyManager, AES256KeyManager
+from securepc.security.encryption import RSAEncryption, AES256Encryption
+from securepc.security.keys import RSAKeyManager, AES256KeyManager
 
 TEST_STRING1 = b'SIRS is fun!'
 TEST_STRING2 = b'We <3 Security'

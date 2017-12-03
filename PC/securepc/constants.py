@@ -1,7 +1,7 @@
 import appdirs
 import os
 
-APP_NAME = 'secure-pc'
+APP_NAME = 'securepc'
 
 PASSWORD_CHECK_NAME = 'password_check'
 FILES_LIST_NAME = 'files.yml'

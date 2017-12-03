@@ -2,8 +2,8 @@ import os
 import tempfile
 import unittest
 
-from .encryption import encrypt_file, decrypt_file
-from ..security import keys
+from securepc.filesystem.encryption import encrypt_file, decrypt_file
+from securepc.security import keys
 
 
 class EncryptionTestCase(unittest.TestCase):

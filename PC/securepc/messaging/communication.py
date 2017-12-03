@@ -1,7 +1,7 @@
-from .interface import CommunicationInterface
-from .constants import uuid
-from ..security.keys import RSAKeyManager, AES256KeyManager, RSAKey, AESKey
-from ..security.encryption import RSAEncryption, AES256Encryption
+from securepc.messaging.interface import CommunicationInterface
+from securepc.messaging.constants import uuid
+from securepc.security.keys import AES256KeyManager, RSAKey, AESKey
+from securepc.security.encryption import RSAEncryption, AES256Encryption
 import bluetooth
 import logging
 

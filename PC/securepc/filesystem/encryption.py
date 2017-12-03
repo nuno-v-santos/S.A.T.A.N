@@ -3,9 +3,9 @@ import shutil
 import logging
 from typing import List
 
-from .constants import BACKUP_DIR
-from .tolerance import *
-from ..security.encryption import AES256Encryption, Key
+from securepc.filesystem.tolerance import *
+from securepc.filesystem.constants import BACKUP_DIR
+from securepc.security.encryption import AES256Encryption, Key
 
 _logger = logging.getLogger('file_encryption')
 

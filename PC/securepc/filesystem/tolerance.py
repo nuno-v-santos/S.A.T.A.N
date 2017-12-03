@@ -1,7 +1,7 @@
 import os
 import logging
 import threading
-from .constants import LOG_PATH, LOG_DIR
+from securepc.filesystem.constants import LOG_PATH, LOG_DIR
 from typing import Dict, NamedTuple
 
 
