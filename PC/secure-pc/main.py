@@ -28,14 +28,14 @@ def main():
         aes_cipher = AES256Encryption(session_key, mode=AES256Encryption.MODE_CBC)
 
         logging.debug("Receiving phone's public key")
-        phone_key = bluetooth_interface.receive(2048)
+        phone_key = bluetooth_interface.receive(480)
         iv, phone_key = phone_key[:16], phone_key[16:]
         logging.debug("Decrypting phone's public key")
         phone_key = aes_cipher.decrypt(phone_key, iv=iv)
         logging.debug("Phone key is {}".format(phone_key))
 
         logging.debug("Receiving Disk Encryption Key")
-        disk_key = bluetooth_interface.receive(2048)
+        disk_key = bluetooth_interface.receive(80)
         logging.debug("Decrypting Disk Encryption Key")
         iv, disk_key = disk_key[:16], disk_key[16:]
         disk_key = aes_cipher.decrypt(disk_key, iv=iv)
