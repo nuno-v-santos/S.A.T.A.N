@@ -70,6 +70,8 @@ def get_file_status() -> Dict[str, str]:
     """
     _logger.debug('Fetching all currently decrypted files from the log')
     file_status: Dict[str, str] = {}
+    if not os.path.exists(LOG_PATH):
+        return {}
     with open(LOG_PATH, 'r') as log_file:
         for line in log_file.readlines():
             fields = line.split(':')
