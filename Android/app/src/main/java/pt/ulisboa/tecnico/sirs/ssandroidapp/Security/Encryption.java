@@ -44,7 +44,7 @@ public class Encryption implements EncryptionInterface {
 
         EAXBlockCipher cipher = new EAXBlockCipher(new AESEngine());
         cipher.init(true, parameters);
-        byte[] encrypted = new byte[128];
+        byte[] encrypted = new byte[512];
         int resultLen = cipher.processBytes(message, 0, message.length, encrypted, 0);
         resultLen += cipher.doFinal(encrypted, resultLen); // appends MAC
         return Arrays.copyOfRange(encrypted, 0, resultLen);
@@ -57,7 +57,7 @@ public class Encryption implements EncryptionInterface {
 
         EAXBlockCipher cipher = new EAXBlockCipher(new AESEngine());
         cipher.init(false, parameters);
-        byte[] decrypted = new byte[128];
+        byte[] decrypted = new byte[512];
         int resultLen = cipher.processBytes(message, 0, message.length, decrypted, 0);
         cipher.doFinal(message, resultLen); // verifies MAC
         return Arrays.copyOfRange(decrypted, 0, resultLen);
