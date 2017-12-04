@@ -10,9 +10,12 @@ class BluetoothCommunication(CommunicationInterface):
     def __init__(self):
         self.logger = logging.getLogger('communication')
         self.socket = None
+        self.name = ''
+        self.address = ''
         self.server_socket = None
 
     def accept(self):
+        self.close()
         self.server_socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         self.server_socket.bind(("", bluetooth.PORT_ANY))
         self.server_socket.listen(1)
@@ -26,6 +29,7 @@ class BluetoothCommunication(CommunicationInterface):
         self.logger.debug("Waiting for connection on RFCOMM port {}".format(self.port))
         self.socket, self.client_info = self.server_socket.accept()
         self.logger.debug("Accepted connection from {}".format(self.client_info))
+        self.name, self.address = self.client_info
 
     def connect(self, address):
         self.logger.debug('Connecting to {}'.format(address))
@@ -41,6 +45,8 @@ class BluetoothCommunication(CommunicationInterface):
             host=host,
             port=port
         ))
+        self.name = name
+        self.address = host
         self.socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         self.socket.connect((host, port))
         self.logger.debug('Connected')
@@ -64,6 +70,9 @@ class BluetoothCommunication(CommunicationInterface):
             self.logger.debug('Closing server socket')
             self.server_socket.close()
 
+    def get_client_info(self):
+        return self.name, self.address
+
     def __enter__(self):
         return self
 
@@ -83,10 +92,6 @@ class SecureCommunication(CommunicationInterface):
     key using RSA-OAEP. From that point on, all messages will consist
     of a 16-byte IV, followed by the message itself, encrypted with
     the session key.
-
-    After closing the connection, this object must not be reused;
-    please create a new instance, encapsulating the same underlying
-    interface if need be.
     """
 
     def __init__(self, communication: CommunicationInterface, key: RSAKey, generate: bool = False):
@@ -136,10 +141,11 @@ class SecureCommunication(CommunicationInterface):
 
     def connect(self, address) -> None:
         """
-        Connect to a peer and exchange a session key
+        Connect to a new peer and exchange a session key
 
         :param address: the address of the peer to connect to
         """
+        self.close()
         self.communication.connect(address)
         self._exchange_keys()
 
@@ -148,6 +154,7 @@ class SecureCommunication(CommunicationInterface):
         Wait until a peer connects; then, exchange
         a session key
         """
+        self.close()
         self.communication.accept()
         self._exchange_keys()
 
@@ -159,3 +166,9 @@ class SecureCommunication(CommunicationInterface):
         msg = self.communication.receive(size)
         decrypted = self.symmetric_cipher.decrypt(msg)
         return decrypted
+
+    def close(self):
+        self.communication.close()
+
+    def get_client_info(self):
+        return self.communication.get_client_info()

@@ -6,14 +6,17 @@ import constants
 
 from typing import List
 
-from pubsub import pub
+from securepc.security.encryption import AES256Encryption, RSAEncryption
+from securepc.security.keys import AES256KeyManager, RSAKeyManager
 
-from security.encryption import AES256Encryption
-from security.keys import Key, KeyPair, AES256KeyManager
+from securepc.messaging.communication import BluetoothCommunication, SecureCommunication
 
 from securepc.exceptions import NoPasswordError
 
-class Application(object):
+
+_instance = None
+
+class _Application(object):
     def __init__(self):
         self.files = []
         self.phone_name = ''
@@ -23,9 +26,19 @@ class Application(object):
 
         self.phone_public_key = None
         self.computer_key_pair = None
+        self.encrypted_file_key = None
         self.file_encryption_key = None
-        self.session_key = None
-        pub.subscribe(self.pair, "pairing_start")
+
+        self.communication = BluetoothCommunication()
+
+        global _instance
+        _instance = self # FIXME improve this singleton
+
+        os.makedirs(constants.CONFIG_DIRECTORY, exist_ok=True)
+
+    @property
+    def public_key(self):
+        return self.computer_key_pair.public_key
 
     def define_password(self, password: str) -> None:
         """
@@ -106,10 +119,60 @@ class Application(object):
         with open(constants.FILES_LIST_PATH, 'wb') as f:
             f.write(encrypted_files_list)
 
-    def pair(self):
+    def accept_connection(self):
         """
-        Pair with the phone.
+        Accept a connection from the phone
         """
-        print("Hey mom look I'm pairing!")
-        __import__('time').sleep(5)
-        print("Done pairing. Did you see any lag in the UI? No? That's right, I'm threaded!")
+        logging.debug("Begin pairing.")
+        self.communication.accept()
+        self.phone_name, self.phone_address = self.communication.get_client_info()
+        self.generate_asymmetric_keys()
+
+    def generate_asymmetric_keys(self):
+        """
+        Generate and store a new RSA key pair
+        :return: the generated public key
+        """
+        logging.debug("Generating asymmetric keys")
+        rsa_key_manager = RSAKeyManager()
+        self.computer_key_pair = rsa_key_manager.create_key_pair(2048)
+        rsa_key_manager.store_key_pair(self.computer_key_pair, constants.PC_KEYS_PATH, self.password)
+        return self.computer_key_pair.public_key
+
+    def store_phone_key(self):
+        RSAKeyManager().store_key(self.phone_public_key, constants.PHONE_KEYS_PATH, self.password)
+
+    def initial_exchange(self):
+        logging.debug("Receiving and decrypting session key")
+        session_key = self.communication.receive(self.computer_key_pair.public_key.size_in_bytes()) # Receive TEK
+        logging.debug("Decrypting session key")
+        rsa_private_cipher = RSAEncryption(self.computer_key_pair.private_key)
+        session_key = rsa_private_cipher.decrypt(session_key)
+
+        self.communication = SecureCommunication(self.communication, self.computer_key_pair.public_key)
+        self.communication.symmetric_key = session_key
+
+        logging.debug("Receiving and decrypting phone's public key")
+        phone_key = self.communication.receive(481) # Receive IV | phone_public[TEK]
+        logging.debug("Phone key is {}".format(phone_key))
+        with io.BytesIO(phone_key) as f:
+            self.phone_public_key = RSAKeyManager().load_key(f)
+
+        self.store_phone_key()
+
+
+        logging.debug("Receiving and decrypting Disk Encryption Key (encrypted by Master Encryption Key)")
+        disk_key_mek = self.communication.receive(80) # receive IV | DEK(MEK)[TEK]
+        logging.debug("Disk Encryption Key (MEK) is {}".format(disk_key_mek.hex()))
+
+
+        # FIXME we don't need this key
+        logging.debug("Receiving and decrypting Disk Encryption Key (unencrypted)")
+        disk_key = self.communication.receive(64)
+        logging.debug("Disk Encryption Key (unencrypted) is {}".format(disk_key.hex()))
+
+        logging.debug("Pairing complete.")
+
+
+def get_instance():
+    return _instance or _Application()

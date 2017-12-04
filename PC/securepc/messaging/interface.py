@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from typing import Tuple
 
 
 class CommunicationInterface(metaclass=ABCMeta):
@@ -41,5 +42,20 @@ class CommunicationInterface(metaclass=ABCMeta):
 
         :param size: max size of received message
         :return: the received message
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_client_info(self) -> Tuple[str, str]:
+        """
+        :return: A tuple containing a textual representation
+                 of the client's name and address, in that order
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def close(self) -> None:
+        """
+        Cleanup any resources
         """
         raise NotImplementedError

@@ -60,8 +60,6 @@ class AES256Encryption(EncryptionInterface):
                 generated.
         """
 
-        message = pad(message, AES.block_size)
-
         mode = kwargs.get('mode')
         if mode is not None:
             self.mode = mode
@@ -82,7 +80,7 @@ class AES256Encryption(EncryptionInterface):
             enc, mac = cipher.encrypt_and_digest(message)
             ciphertext = enc + mac
         else:
-            ciphertext = cipher.encrypt(message)
+            ciphertext = cipher.encrypt(pad(message, AES.block_size))
 
         return iv + ciphertext
 
@@ -126,6 +124,6 @@ class AES256Encryption(EncryptionInterface):
             message = message[:-16]
             plaintext = cipher.decrypt_and_verify(message, mac)
         else:
-            plaintext = cipher.decrypt(message)
+            plaintext = unpad(cipher.decrypt(message), AES.block_size)
 
-        return unpad(plaintext, AES.block_size)
+        return plaintext
