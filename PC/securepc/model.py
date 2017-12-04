@@ -86,6 +86,9 @@ class Model(object):
         return files_list
 
     def save_files_list(self) -> None:
+        """
+        Encrypt and save the files list to the configuration file.
+        """
         if self.local_cipher is None:
             raise NoPasswordError("No valid password has been inputted yet")
 
