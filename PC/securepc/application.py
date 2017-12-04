@@ -123,7 +123,6 @@ class _Application(object):
         """
         Accept a connection from the phone
         """
-        logging.debug("Begin pairing.")
         self.communication.accept()
         self.phone_name, self.phone_address = self.communication.get_client_info()
         self.generate_asymmetric_keys()
