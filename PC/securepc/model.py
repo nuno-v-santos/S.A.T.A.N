@@ -62,8 +62,8 @@ class Model(object):
 
     def load_files_list(self) -> List[str]:
         """
-        Loads the encrypted files list from the given path.
-        :param path:
+        Loads the encrypted files list from the configuration file.
+        :param
         :return:
         """
         if self.local_cipher is None:
