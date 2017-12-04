@@ -1,9 +1,11 @@
-import logging
-import qrcode
 import io
-
+import logging
 from getpass import getpass
+
+import qrcode
+
 from securepc import application
+from securepc.constants import CONFIG_DIRECTORY
 from securepc.security.keys import RSAKeyManager
 
 
@@ -40,4 +42,6 @@ def welcome():
     qr.show()
     app.initial_exchange()
     print("Phone has been successfully paired.")
-
+    print("Your configuration files are located in {}.".format(CONFIG_DIRECTORY))
+    print("Please backup this directory whenever you make a change in the configuration.")
+    print("If you don't, you might lose all your protected files if something happens.")
