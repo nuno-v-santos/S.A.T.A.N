@@ -31,7 +31,6 @@ class CommunicationInterface(metaclass=ABCMeta):
         connected peer
 
         :param msg: the message to send
-        :throw: TimeoutException if timeout has been set and is exceeded
         :return: the number of bytes sent
         """
         raise NotImplementedError
@@ -42,7 +41,6 @@ class CommunicationInterface(metaclass=ABCMeta):
         Receive a message from a peer
 
         :param size: max size of received message
-        :throw: TimeoutException if timeout has been set and is exceeded
         :return: the received message
         """
         raise NotImplementedError
@@ -59,13 +57,5 @@ class CommunicationInterface(metaclass=ABCMeta):
     def close(self) -> None:
         """
         Cleanup any resources
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def set_timeout(self, timeout: int) -> None:
-        """
-        Set a timeout for this socket
-        :param timeout: the timeout value, in seconds
         """
         raise NotImplementedError
