@@ -18,10 +18,9 @@ import pt.ulisboa.tecnico.sirs.ssandroidapp.Messaging.BluetoothCommunication;
 import pt.ulisboa.tecnico.sirs.ssandroidapp.Security.Encryption;
 import pt.ulisboa.tecnico.sirs.ssandroidapp.Security.KeyManagement;
 
-import static android.os.SystemClock.sleep;
-
 public class ConnectionActivity extends AppCompatActivity {
     BluetoothAdapter btAdapter;
+    BluetoothCommunication bComm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +41,7 @@ public class ConnectionActivity extends AppCompatActivity {
             abort();
             return;
         }
-        BluetoothCommunication bComm = new BluetoothCommunication();
+        bComm = new BluetoothCommunication();
         BluetoothDevice blueDvc = getComputerBluetoothDevice(computer.getMac());
 
         if (blueDvc == null) {
@@ -51,21 +50,13 @@ public class ConnectionActivity extends AppCompatActivity {
             return;
         }
 
-        int tries = Constants.BLUETOOTH_CONNECTION_TRIES;
-        while (!bComm.connect(blueDvc)) {
-            Toast.makeText(getApplicationContext(), R.string.bluetooth_connection_error_retry, Toast.LENGTH_SHORT).show();
-            // TODO RETRY DELAY
-            if (--tries == 0) {
-                Toast.makeText(getApplicationContext(), R.string.bluetooth_connection_error, Toast.LENGTH_SHORT).show();
-                abort();
-                return;
-            }
-        }
+        if (!bComm.connect(blueDvc))
+            Toast.makeText(getApplicationContext(), R.string.bluetooth_connection_error, Toast.LENGTH_SHORT).show();
 
         try {
             // TEK Establishment
             statusView.setText(R.string.tek_establishment);
-            byte[] encryptedTEK = bComm.receiveMessage(256); // FIXME this receive can get both computer messages
+            byte[] encryptedTEK = bComm.receiveMessage(256);
             Key privateKey = km.loadKey(this, Constants.ANDROID_PRIVATE_KEY_ID, password);
             byte[] encodedTEK = en.RSAdecrypt(encryptedTEK, privateKey);
             Key TEK = km.createSymmetricKey(encodedTEK);
@@ -108,7 +99,6 @@ public class ConnectionActivity extends AppCompatActivity {
             abort();
             return;
         }
-
     }
 
     private boolean checkDeviceBluetooth() {
@@ -138,6 +128,7 @@ public class ConnectionActivity extends AppCompatActivity {
 
     public void connectionDone(View view) {
         HeartbeatService.shouldContinue = false;
+        bComm.close();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
