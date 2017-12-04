@@ -75,7 +75,7 @@ public class ConnectionActivity extends AppCompatActivity {
             byte[] encryptedDEKMEK = bComm.receiveMessage(80);
             byte[] encryptedDEKMEKiv = Arrays.copyOfRange(encryptedDEKMEK, 0, 16);
             encryptedDEKMEK = Arrays.copyOfRange(encryptedDEKMEK, 16, encryptedDEKMEK.length);
-            byte[] encodedDEKMEK = en.AESdecrypt(encryptedDEKMEK, TEK, "CBC", encryptedDEKMEKiv);
+            byte[] encodedDEKMEK = en.AESEAXdecrypt(encryptedDEKMEK, TEK, encryptedDEKMEKiv);
 
             // DEK retrieve and dispatch
             statusView.setText(R.string.send_dek);
@@ -84,8 +84,8 @@ public class ConnectionActivity extends AppCompatActivity {
             byte[] ivTEK = new byte[16];
             random.nextBytes(ivTEK);
             byte[] ivMEK = km.loadIV(this, Constants.ANDROID_MEK_IV_ID, password);
-            byte[] encodedDEK = en.AESdecrypt(encodedDEKMEK, MEK, "CBC", ivMEK);
-            byte[] encryptedDEK = en.AESencrypt(encodedDEK, TEK, "CBC", ivTEK);
+            byte[] encodedDEK = en.AESEAXdecrypt(encodedDEKMEK, MEK, ivMEK);
+            byte[] encryptedDEK = en.AESEAXencrypt(encodedDEK, TEK, ivTEK);
 
             // iv || DEK[TEK]
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

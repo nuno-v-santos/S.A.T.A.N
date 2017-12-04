@@ -63,7 +63,7 @@ public class HeartbeatService extends IntentService {
                 nounceSet.add(nounce);
 
                 byte[] encodedNounce = ByteBuffer.allocate(4).putInt(nounce).array();
-                byte[] encryptedNounce = en.AESencrypt(encodedNounce, TEK, "CBC", ivTEK);
+                byte[] encryptedNounce = en.AESEAXencrypt(encodedNounce, TEK, ivTEK);
 
                 // iv || nounce[TEK]
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();

@@ -64,7 +64,7 @@ public class KeyExchangeActivity extends AppCompatActivity {
 
             String publicPEMKey = km.getKeyPEMFormat(publicKey);
 
-            byte[] encryptedPublic = encryption.AESencrypt(publicPEMKey.getBytes(), TEK, "CBC", ivTEK);
+            byte[] encryptedPublic = encryption.AESEAXencrypt(publicPEMKey.getBytes(), TEK, ivTEK);
 
             // iv || publicKey[TEK]
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -86,8 +86,8 @@ public class KeyExchangeActivity extends AppCompatActivity {
             // DEK(MEK)[TEK] Dispatch
             statusTV.setText(R.string.dek_mek_dispatch);
             progressBar.setProgress(60);
-            byte[] encryptedDEK = encryption.AESencrypt(DEK.getEncoded(), MEK, "CBC", ivMEK);
-            byte[] encryptedDEKMEK = encryption.AESencrypt(encryptedDEK, TEK, "CBC", ivTEK);
+            byte[] encryptedDEK = encryption.AESEAXencrypt(DEK.getEncoded(), MEK, ivMEK);
+            byte[] encryptedDEKMEK = encryption.AESEAXencrypt(encryptedDEK, TEK, ivTEK);
 
             // iv || DEK(MEK)[TEK]
             baos = new ByteArrayOutputStream();
@@ -101,7 +101,7 @@ public class KeyExchangeActivity extends AppCompatActivity {
             statusTV.setText(R.string.send_dek);
             progressBar.setProgress(75);
             random.nextBytes(ivTEK);
-            encryptedDEK = encryption.AESencrypt(DEK.getEncoded(), TEK, "CBC", ivTEK);
+            encryptedDEK = encryption.AESEAXencrypt(DEK.getEncoded(), TEK, ivTEK);
 
             // iv || DEK[TEK]
             baos = new ByteArrayOutputStream();
