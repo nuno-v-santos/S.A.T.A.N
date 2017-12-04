@@ -11,7 +11,7 @@ import ui.qr_code
 from security.keys import RSAKeyManager, AES256KeyManager, RSA
 from security.encryption import RSAEncryption, AES256Encryption
 
-from securepc.model import Model
+from securepc.application import Application
 
 
 def main():
@@ -83,13 +83,13 @@ def main():
 
 def main2():
     logging.getLogger().setLevel(logging.DEBUG)
-    model = Model()
+    model = Application()
     app = wx.App()
     qr = qrcode.make("Never gonna give you up\nNever gonna let you down\nNever gonna turn around and desert you")
     welcome = ui.welcome.WelcomeDialog(None)
-    dialog = ui.qr_code.QRDialog(qr, None)
+    # dialog = ui.qr_code.QRDialog(qr, None)
     welcome.Show()
-    dialog.Show()
+    # dialog.Show()
     app.MainLoop()
 
 

@@ -13,7 +13,7 @@ from security.keys import Key, KeyPair, AES256KeyManager
 
 from securepc.exceptions import NoPasswordError
 
-class Model(object):
+class Application(object):
     def __init__(self):
         self.files = []
         self.phone_name = ''
@@ -48,7 +48,7 @@ class Model(object):
     def validate_password(self, password: str) -> bool:
         """
         Checks if the given password matches the stored one.
-        This password will be stored in the model.
+        This password will be stored in the application.
 
         :param password: the password to validate
         :return: True if password is valid, False otherwise
@@ -110,4 +110,6 @@ class Model(object):
         """
         Pair with the phone.
         """
-        pass
+        print("Hey mom look I'm pairing!")
+        __import__('time').sleep(5)
+        print("Done pairing. Did you see any lag in the UI? No? That's right, I'm threaded!")

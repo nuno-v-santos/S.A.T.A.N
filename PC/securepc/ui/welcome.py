@@ -7,6 +7,7 @@
 import wx
 from abc import ABCMeta, abstractmethod
 from pubsub import pub
+from securepc.util import async_publish
 
 # begin wxGlade: dependencies
 # end wxGlade
@@ -14,17 +15,12 @@ from pubsub import pub
 # begin wxGlade: extracode
 # end wxGlade
 
-class WelcomeDialog(wx.Dialog):
+class WelcomeDialog(wx.Frame):
     def __init__(self, *args, **kwds):
-        self.state = WelcomeState(self)
 
         # begin wxGlade: WelcomeDialog.__init__
-        wx.Dialog.__init__(self, *args, **kwds)
-        self.welcome_text = wx.StaticText(self, wx.ID_ANY,
-                                          "Welcome to SecurePC (name pending)! Looks like this is your\n" +
-                                          "first time starting this application. Please open the application\n" +
-                                          "on your phone, make sure you have Bluetooth enabled on your computer,\n" +
-                                          " and then click Next.")
+        wx.Frame.__init__(self, *args, **kwds)
+        self.welcome_text = wx.StaticText(self, wx.ID_ANY, "")
         self.quit_button = wx.Button(self, wx.ID_ANY, "Quit")
         self.previous_button = wx.Button(self, wx.ID_ANY, "Previous")
         self.next_button = wx.Button(self, wx.ID_ANY, "Next")
@@ -35,6 +31,8 @@ class WelcomeDialog(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.exit, self.quit_button)
         self.Bind(wx.EVT_BUTTON, self.previous, self.previous_button)
         self.Bind(wx.EVT_BUTTON, self.next, self.next_button)
+
+        self.state = WelcomeState(self)
 
     def __set_properties(self):
         # begin wxGlade: WelcomeDialog.__set_properties
@@ -55,6 +53,18 @@ class WelcomeDialog(wx.Dialog):
         sizer_1.Fit(self)
         self.Layout()
         # end wxGlade
+        self.sizer_1 = sizer_1
+
+    @property
+    def label(self):
+        return self.welcome_text.GetLabel()
+
+    @label.setter
+    def label(self, text):
+        self.welcome_text.SetLabel(text)
+
+    def update_size(self):
+        self.sizer_1.Fit(self)
 
     def exit(self, event):
         self.state.exit()
@@ -84,12 +94,18 @@ class _State(metaclass=ABCMeta):
 class WelcomeState(_State):
     def __init__(self, welcome_dialog: WelcomeDialog):
         self.dialog = welcome_dialog
+        self.dialog.label = (
+            "Welcome to SecurePC (name pending)! Looks like this is your\n" +
+            "first time starting this application. Please open the application\n" +
+            "on your phone, make sure you have Bluetooth enabled on your computer,\n" +
+            " and then click Next."
+        )
+        self.dialog.update_size()
 
     def exit(self):
         self.dialog.Close()
 
     def next(self):
-        self.dialog.welcome_text.SetLabel("Waiting for your phone to pair with this computer.")
         self.dialog.state = PairingState(self.dialog)
 
     def previous(self):
@@ -98,11 +114,13 @@ class WelcomeState(_State):
 
 class PairingState(_State):
     def __init__(self, welcome_dialog: WelcomeDialog):
+
         self.dialog = welcome_dialog
+        self.dialog.label = "Waiting for your phone to pair with this computer."
         self.dialog.next_button.Disable()
         self.dialog.previous_button.Disable()
         pub.subscribe(self.next, "pairing_done")
-        pub.sendMessage("pairing_start")
+        async_publish("pairing_start")
 
     def exit(self):
         self.dialog.Close()
