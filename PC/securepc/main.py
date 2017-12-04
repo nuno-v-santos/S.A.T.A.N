@@ -1,5 +1,5 @@
 import logging
-from ui.main import MainUI
+from securepc.ui.main import MainUI
 
 def main():
     logging.getLogger().setLevel(logging.DEBUG)
