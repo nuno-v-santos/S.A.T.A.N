@@ -5,6 +5,8 @@
 #
 
 import wx
+from abc import ABCMeta, abstractmethod
+from pubsub import pub
 
 # begin wxGlade: dependencies
 # end wxGlade
@@ -14,9 +16,15 @@ import wx
 
 class WelcomeDialog(wx.Dialog):
     def __init__(self, *args, **kwds):
+        self.state = WelcomeState(self)
+
         # begin wxGlade: WelcomeDialog.__init__
         wx.Dialog.__init__(self, *args, **kwds)
-        self.welcome_text = wx.StaticText(self, wx.ID_ANY, "Welcome to SecurePC (name pending)!")
+        self.welcome_text = wx.StaticText(self, wx.ID_ANY,
+                                          "Welcome to SecurePC (name pending)! Looks like this is your\n" +
+                                          "first time starting this application. Please open the application\n" +
+                                          "on your phone, make sure you have Bluetooth enabled on your computer,\n" +
+                                          " and then click Next.")
         self.quit_button = wx.Button(self, wx.ID_ANY, "Quit")
         self.previous_button = wx.Button(self, wx.ID_ANY, "Previous")
         self.next_button = wx.Button(self, wx.ID_ANY, "Next")
@@ -24,6 +32,9 @@ class WelcomeDialog(wx.Dialog):
         self.__set_properties()
         self.__do_layout()
         # end wxGlade
+        self.Bind(wx.EVT_BUTTON, self.exit, self.quit_button)
+        self.Bind(wx.EVT_BUTTON, self.previous, self.previous_button)
+        self.Bind(wx.EVT_BUTTON, self.next, self.next_button)
 
     def __set_properties(self):
         # begin wxGlade: WelcomeDialog.__set_properties
@@ -44,4 +55,60 @@ class WelcomeDialog(wx.Dialog):
         sizer_1.Fit(self)
         self.Layout()
         # end wxGlade
+
+    def exit(self, event):
+        self.state.exit()
+
+    def next(self, event):
+        self.state.next()
+
+    def previous(self, event):
+        self.state.exit()
+
 # end of class WelcomeDialog
+
+class _State(metaclass=ABCMeta):
+    @abstractmethod
+    def exit(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def next(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def previous(self):
+        raise NotImplementedError
+
+
+class WelcomeState(_State):
+    def __init__(self, welcome_dialog: WelcomeDialog):
+        self.dialog = welcome_dialog
+
+    def exit(self):
+        self.dialog.Close()
+
+    def next(self):
+        self.dialog.welcome_text.SetLabel("Waiting for your phone to pair with this computer.")
+        self.dialog.state = PairingState(self.dialog)
+
+    def previous(self):
+        raise RuntimeError("Can't go further back")
+
+
+class PairingState(_State):
+    def __init__(self, welcome_dialog: WelcomeDialog):
+        self.dialog = welcome_dialog
+        self.dialog.next_button.Disable()
+        self.dialog.previous_button.Disable()
+        pub.subscribe(self.next, "pairing_done")
+        pub.sendMessage("pairing_start")
+
+    def exit(self):
+        self.dialog.Close()
+
+    def next(self):
+        pass
+
+    def previous(self):
+        pass
