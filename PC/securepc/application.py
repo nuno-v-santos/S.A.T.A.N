@@ -40,6 +40,9 @@ class _Application(object):
     def public_key(self):
         return self.computer_key_pair.public_key
 
+    def has_paired(self):
+        return all(os.path.exists(path) for path in constants.CONFIG_FILES)
+
     def define_password(self, password: str) -> None:
         """
         Define a new password. WARNING: THIS ASSUMES THERE WAS

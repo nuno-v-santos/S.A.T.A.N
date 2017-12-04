@@ -16,4 +16,11 @@ FILES_LIST_PATH = os.path.join(appdirs.user_config_dir(APP_NAME), FILES_LIST_NAM
 PC_KEYS_PATH = os.path.join(appdirs.user_config_dir(APP_NAME), PC_KEYS_NAME)
 PHONE_KEYS_PATH = os.path.join(appdirs.user_config_dir(APP_NAME), PHONE_KEYS_NAME)
 
+CONFIG_FILES = [
+    PASSWORD_CHECK_PATH,
+    FILES_LIST_PATH,
+    PC_KEYS_PATH,
+    PHONE_KEYS_PATH
+]
+
 PASSWORD_CHECK_STRING = b'All work and no play makes Jack a dull boy'
