@@ -155,7 +155,7 @@ class SecureCommunication(CommunicationInterface):
         encrypted = self.symmetric_cipher.encrypt(msg)
         return self.communication.send(encrypted)
 
-    def receive(self, size: int) -> bytes:
+    def receive(self, size: int = 1024) -> bytes:
         msg = self.communication.receive(size)
         decrypted = self.symmetric_cipher.decrypt(msg)
         return decrypted
