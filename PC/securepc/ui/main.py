@@ -120,7 +120,7 @@ class MainUI(object):
 
         Process the user's input and redirect it to the application
         """
-        print("Welcome to {}.")
+        print("Welcome to {}.".format(APP_NAME))
         while self.running:
             line = input().split()
             if not line:
