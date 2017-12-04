@@ -2,10 +2,16 @@ import logging
 import qrcode
 import time
 import io
+import wx
 
-from messaging.communication import BluetoothCommunication, SecureCommunication
+import ui.welcome
+import ui.qr_code
+
+#from messaging.communication import BluetoothCommunication, SecureCommunication
 from security.keys import RSAKeyManager, AES256KeyManager, RSA
 from security.encryption import RSAEncryption, AES256Encryption
+
+from securepc.model import Model
 
 
 def main():
@@ -74,5 +80,18 @@ def main():
                 logging.debug("*gasp* This number was used more than once!")
             nonces.add(heartbeat)
 
+
+def main2():
+    logging.getLogger().setLevel(logging.DEBUG)
+    model = Model()
+    app = wx.App()
+    qr = qrcode.make("Never gonna give you up\nNever gonna let you down\nNever gonna turn around and desert you")
+    welcome = ui.welcome.WelcomeDialog(None)
+    dialog = ui.qr_code.QRDialog(qr, None)
+    welcome.Show()
+    dialog.Show()
+    app.MainLoop()
+
+
 if __name__ == '__main__':
-    main()
+    main2()
