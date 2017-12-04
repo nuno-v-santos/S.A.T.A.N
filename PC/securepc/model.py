@@ -3,10 +3,15 @@ import os
 import yaml
 import logging
 import constants
+
 from typing import List
+
+from pubsub import pub
+
 from security.encryption import AES256Encryption
 from security.keys import Key, KeyPair, AES256KeyManager
-from exceptions import NoPasswordError
+
+from securepc.exceptions import NoPasswordError
 
 class Model(object):
     def __init__(self):
@@ -20,6 +25,7 @@ class Model(object):
         self.computer_key_pair = None
         self.file_encryption_key = None
         self.session_key = None
+        pub.subscribe(self.pair, "pairing_start")
 
     def define_password(self, password: str) -> None:
         """
@@ -99,3 +105,9 @@ class Model(object):
         encrypted_files_list = self.local_cipher.encrypt(files_list.encode('utf-8'))
         with open(constants.FILES_LIST_PATH, 'wb') as f:
             f.write(encrypted_files_list)
+
+    def pair(self):
+        """
+        Pair with the phone.
+        """
+        pass
