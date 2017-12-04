@@ -1,9 +1,10 @@
 import logging
-from ui.welcome import welcome
+from ui.main import MainUI
 
 def main():
     logging.getLogger().setLevel(logging.DEBUG)
-    welcome()
+    ui = MainUI()
+    ui.start()
 
 
 if __name__ == '__main__':
