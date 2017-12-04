@@ -1,6 +1,13 @@
 package pt.ulisboa.tecnico.sirs.ssandroidapp.Security;
 
+import org.spongycastle.crypto.engines.AESEngine;
+import org.spongycastle.crypto.modes.EAXBlockCipher;
+import org.spongycastle.crypto.params.AEADParameters;
+import org.spongycastle.crypto.params.KeyParameter;
+
 import java.security.Key;
+import java.util.Arrays;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 
@@ -28,6 +35,32 @@ public class Encryption implements EncryptionInterface {
         cipher = Cipher.getInstance("AES/" + mode + "/PKCS7Padding");
         cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
         return cipher.doFinal(message);
+    }
+
+    @Override
+    public byte[] AESEAXencrypt(byte[] message, Key key, byte[] iv) throws Exception {
+        KeyParameter keyParameter = new KeyParameter(key.getEncoded());
+        AEADParameters parameters = new AEADParameters(keyParameter, 128, iv, null);
+
+        EAXBlockCipher cipher = new EAXBlockCipher(new AESEngine());
+        cipher.init(true, parameters);
+        byte[] encrypted = new byte[128];
+        int resultLen = cipher.processBytes(message, 0, message.length, encrypted, 0);
+        resultLen += cipher.doFinal(encrypted, resultLen); // appends MAC
+        return Arrays.copyOfRange(encrypted, 0, resultLen);
+    }
+
+    @Override
+    public byte[] AESEAXdecrypt(byte[] message, Key key, byte[] iv) throws Exception {
+        KeyParameter keyParameter = new KeyParameter(key.getEncoded());
+        AEADParameters parameters = new AEADParameters(keyParameter, 128, iv, null);
+
+        EAXBlockCipher cipher = new EAXBlockCipher(new AESEngine());
+        cipher.init(false, parameters);
+        byte[] decrypted = new byte[128];
+        int resultLen = cipher.processBytes(message, 0, message.length, decrypted, 0);
+        cipher.doFinal(message, resultLen); // verifies MAC
+        return Arrays.copyOfRange(decrypted, 0, resultLen);
     }
 
     @Override
