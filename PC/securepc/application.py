@@ -2,25 +2,34 @@ import io
 import os
 import yaml
 import logging
-import constants
 
 from typing import List
+
+from pubsub import pub
+
+from securepc import constants
+
+from securepc.util import async_publish
+
+from securepc.exceptions import NoPasswordError
 
 from securepc.security.encryption import AES256Encryption, RSAEncryption
 from securepc.security.keys import AES256KeyManager, RSAKeyManager
 
 from securepc.messaging.communication import BluetoothCommunication, SecureCommunication
+from securepc.messaging.exceptions import TimeoutException
 
-from securepc.exceptions import NoPasswordError
-
+from securepc.filesystem.encryption import encrypt_all, decrypt_all
 
 _instance = None
+
 
 class _Application(object):
     def __init__(self):
         self.files = []
         self.phone_name = ''
         self.phone_address = ''
+        self.running = True
 
         self.local_cipher = None
 
@@ -30,6 +39,7 @@ class _Application(object):
         self.file_encryption_key = None
 
         self.communication = BluetoothCommunication()
+        pub.subscribe(self.mainloop, 'app_start')
 
         global _instance
         _instance = self # FIXME improve this singleton
@@ -40,6 +50,9 @@ class _Application(object):
     def public_key(self):
         return self.computer_key_pair.public_key
 
+    def has_paired(self):
+        return all(os.path.exists(path) for path in constants.CONFIG_FILES)
+
     def define_password(self, password: str) -> None:
         """
         Define a new password. WARNING: THIS ASSUMES THERE WAS
@@ -48,12 +61,12 @@ class _Application(object):
 
         :param password: the new password
         """
-        self.password = password
         aes_key_manager = AES256KeyManager()
         local_key = aes_key_manager.create_key(password.encode('utf-8'))
         aes_cipher = AES256Encryption(local_key, mode=AES256Encryption.MODE_EAX)
         self.local_cipher = aes_cipher
-        
+        self.password = password
+
         encrypted_password_check = aes_cipher.encrypt(constants.PASSWORD_CHECK_STRING)
         with open(constants.PASSWORD_CHECK_PATH, 'wb') as f:
             f.write(encrypted_password_check)
@@ -77,6 +90,7 @@ class _Application(object):
             return False
 
         self.local_cipher = aes_cipher
+        self.password = password
         return True
 
     def load_files_list(self) -> List[str]:
@@ -123,7 +137,6 @@ class _Application(object):
         """
         Accept a connection from the phone
         """
-        logging.debug("Begin pairing.")
         self.communication.accept()
         self.phone_name, self.phone_address = self.communication.get_client_info()
         self.generate_asymmetric_keys()
@@ -141,6 +154,22 @@ class _Application(object):
 
     def store_phone_key(self):
         RSAKeyManager().store_key(self.phone_public_key, constants.PHONE_KEYS_PATH, self.password)
+
+    def load_phone_key(self):
+        self.phone_public_key = RSAKeyManager().load_key(constants.PHONE_KEYS_PATH, self.password)
+
+    def ensure_encryption(self) -> bool:
+        """
+        Makes sure no files are left encrypted from a crashed session.
+
+        :return True if a crash was detected; False otherwise
+        """
+        if os.path.exists(constants.DECRYPTED_DISK_KEY_NAME):
+            disk_key = AES256KeyManager().load_key(constants.DECRYPTED_DISK_KEY_PATH, self.password)
+            encrypt_all(self.files, disk_key)
+            os.remove(constants.DECRYPTED_DISK_KEY_PATH)
+            return True
+        return False
 
     def initial_exchange(self):
         logging.debug("Receiving and decrypting session key")
@@ -163,6 +192,7 @@ class _Application(object):
 
         logging.debug("Receiving and decrypting Disk Encryption Key (encrypted by Master Encryption Key)")
         disk_key_mek = self.communication.receive(80) # receive IV | DEK(MEK)[TEK]
+        AES256KeyManager().store_key(disk_key_mek, constants.ENCRYPTED_DISK_KEY_PATH)
         logging.debug("Disk Encryption Key (MEK) is {}".format(disk_key_mek.hex()))
 
 
@@ -172,6 +202,62 @@ class _Application(object):
         logging.debug("Disk Encryption Key (unencrypted) is {}".format(disk_key.hex()))
 
         logging.debug("Pairing complete.")
+
+        self.communication.close()
+
+    def add_file(self, file: str):
+        if os.path.exists(file) and not file in self.files:
+            self.files.append(file)
+            self.save_files_list()
+            async_publish("file_list_changed", list(self.files))
+
+    def remove_file(self, file: str):
+        index = self.files.index(file)
+        if index != -1:
+            del self.files[index]
+            async_publish("file_list_changed", list(self.files))
+
+    def mainloop(self):
+        self.load_phone_key()
+
+        self.communication = SecureCommunication(
+            BluetoothCommunication(),
+            self.phone_public_key,
+            generate=True
+        )
+
+        while self.running:
+            self.communication.accept()
+            async_publish('connected')
+            self.communication.send(self.encrypted_file_key)
+            self.decrypted_file_key = self.communication.receive(64)
+            self.decrypt_all()
+            async_publish('decrypted')
+
+            nonces = set()
+            self.communication.set_timeout(constants.HEARTBEAT_TIMEOUT)
+            while self.running:
+                try:
+                    nonce = int.from_bytes(self.communication.receive(), 'big')
+                except TimeoutException:
+                    async_publish('disconnected')
+                    self.encrypt_all()
+                    async_publish('encrypted')
+                    break
+                if nonce in nonces:
+                    async_publish('bad_nonce')
+                    self.exit()
+
+    def encrypt_all(self):
+        encrypt_all(self.files, self.file_encryption_key)
+        os.remove(constants.DECRYPTED_DISK_KEY_PATH)
+        self.decrypted_file_key = None
+
+    def decrypt_all(self):
+        decrypt_all(self.files, self.file_encryption_key)
+
+    def exit(self):
+        self.running = False
 
 
 def get_instance():

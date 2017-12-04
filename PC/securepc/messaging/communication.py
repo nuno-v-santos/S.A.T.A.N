@@ -1,5 +1,6 @@
 from securepc.messaging.interface import CommunicationInterface
 from securepc.messaging.constants import uuid
+from securepc.messaging.exceptions import TimeoutException
 from securepc.security.keys import AES256KeyManager, RSAKey, AESKey
 from securepc.security.encryption import RSAEncryption, AES256Encryption
 import bluetooth
@@ -53,11 +54,17 @@ class BluetoothCommunication(CommunicationInterface):
 
     def receive(self, size=1024):
         self.logger.debug('Receiving message of max size {}'.format(size))
-        return self.socket.recv(size)
+        try:
+            return self.socket.recv(size)
+        except bluetooth.BluetoothError:
+            raise TimeoutException("Timed out")
 
     def send(self, msg):
         self.logger.debug('Sending {}'.format(msg))
-        return self.socket.send(msg)
+        try:
+            return self.socket.send(msg)
+        except bluetooth.BluetoothError:
+            raise TimeoutException("Timed out")
 
     def close(self):
         self.logger.debug('Closing BluetoothCommunication')
@@ -72,6 +79,9 @@ class BluetoothCommunication(CommunicationInterface):
 
     def get_client_info(self):
         return self.name, self.address
+
+    def set_timeout(self, timeout: int):
+        self.socket.settimeout(timeout)
 
     def __enter__(self):
         return self
@@ -172,3 +182,6 @@ class SecureCommunication(CommunicationInterface):
 
     def get_client_info(self):
         return self.communication.get_client_info()
+
+    def set_timeout(self, timeout: int):
+        self.communication.set_timeout(timeout)

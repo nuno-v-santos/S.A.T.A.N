@@ -3,12 +3,20 @@ import re
 import readline
 
 from typing import List
+from pubsub import pub
 
 
 _COMMANDS = ['add', 'remove']
 _RE_SPACE = re.compile('.*\s+$', re.M)
 
 class _Completer(object):
+    def __init__(self, file_list: List[str] = []):
+        self._file_list = file_list
+        pub.subscribe(self._update_file_list, "file_list_changed")
+
+    def _update_file_list(self, file_list):
+        self._file_list = file_list
+
     def _listdir(self, root: str) -> List[str]:
         """
         List the contents of a directory.
@@ -44,14 +52,18 @@ class _Completer(object):
         return [path + ' ']
 
     def complete_add(self, args):
-        "Completions for the 'extra' command."
+        "Completions for the 'add' command."
         if not args:
             return self._complete_path('.')
         # treat the last arg as a path and complete it
         return self._complete_path(args[-1])
 
     def complete_remove(self, args):
-        return self.complete_add(args)
+        "Completions for the 'remove' command."
+        if not args:
+            return self._file_list
+        results = [p for p in self._file_list if p.startswith(args[-1])]
+        return results
 
     def complete(self, text, state):
         """
