@@ -189,17 +189,10 @@ class _Application(object):
 
         self.store_phone_key()
 
-
         logging.debug("Receiving and decrypting Disk Encryption Key (encrypted by Master Encryption Key)")
         disk_key_mek = self.communication.receive(80) # receive IV | DEK(MEK)[TEK]
         AES256KeyManager().store_key(disk_key_mek, constants.ENCRYPTED_DISK_KEY_PATH)
         logging.debug("Disk Encryption Key (MEK) is {}".format(disk_key_mek.hex()))
-
-
-        # FIXME we don't need this key
-        logging.debug("Receiving and decrypting Disk Encryption Key (unencrypted)")
-        disk_key = self.communication.receive(64)
-        logging.debug("Disk Encryption Key (unencrypted) is {}".format(disk_key.hex()))
 
         logging.debug("Pairing complete.")
 
