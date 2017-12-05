@@ -26,7 +26,7 @@ CONFIG_FILES = [
     FILES_LIST_PATH,
     PC_KEYS_PATH,
     PHONE_KEYS_PATH,
-    ENCRYPTED_FILE_KEY_NAME,
+    ENCRYPTED_FILE_KEY_PATH,
 ]
 
 PASSWORD_CHECK_STRING = b'All work and no play makes Jack a dull boy'
