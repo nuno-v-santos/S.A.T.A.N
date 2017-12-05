@@ -87,24 +87,28 @@ class MainUI(object):
             sys.exit(1)
 
     def handle_connect(self):
-        self.connected = True
-        print('Phone has connected')
+        if not self.connected:
+            self.connected = True
+            print('Phone has connected')
 
     def handle_disconnect(self):
-        self.connected = False
-        print('Phone has disconnected')
+        if self.connected:
+            self.connected = False
+            print('Phone has disconnected')
 
     def handle_bad_nonce(self):
         print("Potential attack detected! Shutting down")
         self.exit()
 
     def handle_encrypted(self):
-        self.encrypted = True
-        print("Files have been encrypted")
+        if not self.encrypted:
+            print("Files have been encrypted")
+            self.encrypted = True
 
     def handle_decrypted(self):
-        self.encrypted = False
-        print("Files have been decrypted")
+        if self.encrypted:
+            self.encrypted = False
+            print("Files have been decrypted")
 
     def print_instructions(self):
         print("Valid commands:".format(APP_NAME))
