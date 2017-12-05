@@ -95,7 +95,10 @@ def get_file_status() -> Dict[str, str]:
         for line in log_file.readlines():
             fields = line.split(':')
             opcode = fields[0]
-            path = str(bytes.fromhex(fields[1]), 'utf-8')
+            try:
+                path = str(bytes.fromhex(fields[1]), 'utf-8')
+            except:
+                continue # some error happened writing this line to the log, ignore it
             if opcode == 'ds':
                 logging.debug("Found decryption-in-progress file at {}".format(path))
                 file_status[path] = 'decrypting'
