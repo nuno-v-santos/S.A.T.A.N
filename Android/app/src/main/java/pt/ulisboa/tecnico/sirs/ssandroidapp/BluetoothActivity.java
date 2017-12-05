@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -35,11 +36,13 @@ public class BluetoothActivity extends AppCompatActivity {
     BluetoothCommunication btCommunication = new BluetoothCommunication();
     HashMap<String,BluetoothDevice> deviceMapping = new HashMap<>();
     Computer pc;
+    Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
+        mHandler = new Handler();
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -66,6 +69,24 @@ public class BluetoothActivity extends AppCompatActivity {
         itemClickListener();
     }
 
+    //This discovers the devices nearby
+    final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            // When discovery finds a device
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // Get the BluetoothDevice object from the Intent
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                String new_device = device.getName() + " " + device.getAddress();
+                if (!discovered_devices_description.contains(new_device)) {
+                    discovered_devices_description.add(new_device);
+                    deviceMapping.put(device.getAddress(),device);
+                    discoveredAdapter.notifyDataSetChanged();
+                }
+            }
+        }
+    };
+
     private void itemClickListener() {
         //if clicked on paired device
         pairedDevicesList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
@@ -73,8 +94,7 @@ public class BluetoothActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapter,View v, int position, long id){
                 //get the clicked device
                 String clickedDevice = (String) adapter.getItemAtPosition(position);
-                CreatePC(clickedDevice);  //create PC and set name and mac
-                Connect2Device();
+                new Connection(clickedDevice).start();
             }
         });
 
@@ -84,8 +104,7 @@ public class BluetoothActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapter,View v, int position, long id){
                 //get the clicked device
                 String clickedDevice = (String) adapter.getItemAtPosition(position);
-                CreatePC(clickedDevice);  //create PC and set name and mac
-                Connect2Device();
+                new Connection(clickedDevice).start();
             }
         });
     }
@@ -130,53 +149,51 @@ public class BluetoothActivity extends AppCompatActivity {
         }
     }
 
-    //This discovers the devices nearby
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-        String action = intent.getAction();
-        // When discovery finds a device
-        if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-            // Get the BluetoothDevice object from the Intent
-            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            String new_device = device.getName() + " " + device.getAddress();
-            if (!discovered_devices_description.contains(new_device)) {
-                discovered_devices_description.add(new_device);
-                deviceMapping.put(device.getAddress(),device);
-                discoveredAdapter.notifyDataSetChanged();
-            }
+    class Connection extends Thread {
+
+        private String clickedDevice;
+
+        public Connection(String d) {
+            this.clickedDevice = d;
         }
-        }
-    };
 
-    public void CreatePC(String clickedDevice) {
-        String[] description = clickedDevice.split(" ");
-        String chosen_mac = description[description.length - 1];
-        String chosen_name = clickedDevice.replace(chosen_mac,"").trim();
-        pc = new Computer();
-        pc.setName(chosen_name);
-        pc.setMac(chosen_mac);
-    }
+        @Override
+        public void run() {
+            String[] description = clickedDevice.split(" ");
+            String chosen_mac = description[description.length - 1];
+            String chosen_name = clickedDevice.replace(chosen_mac,"").trim();
 
-    public void Connect2Device() {
-        boolean connected = btCommunication.connect(deviceMapping.get(pc.getMac()));
+            boolean connected = btCommunication.connect(deviceMapping.get(chosen_mac));
 
-        if (connected) {
-            //stop discovery
-            if (btAdapter.isDiscovering()) {
-                unregisterReceiver(mReceiver);
-                btAdapter.cancelDiscovery();
+            if (connected) {
+                //stop discovery
+                if (btAdapter.isDiscovering()) {
+                    unregisterReceiver(mReceiver);
+                    btAdapter.cancelDiscovery();
+                }
+
+                //save PC
+                pc = new Computer();
+                pc.setName(chosen_name);
+                pc.setMac(chosen_mac);
+
+                //save btCommunication
+                MyApplication app = (MyApplication) getApplicationContext();
+                app.setCommunicationInterface(btCommunication);
+
+                Intent intent = new Intent(getBaseContext(), QRScannerActivity.class);
+                intent.putExtra(Constants.COMPUTER_OBJ, pc);
+                intent.putExtra(Constants.PASSWORD_ID, getIntent().getStringExtra(Constants.PASSWORD_ID));
+                startActivity(intent);
+            } else {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        toast("Connection Failed. Try again.");
+                    }
+                });
+
             }
-
-            //save btCommunication
-            MyApplication app = (MyApplication) getApplicationContext();
-            app.setCommunicationInterface(btCommunication);
-
-            Intent intent = new Intent(getBaseContext(), QRScannerActivity.class);
-            intent.putExtra(Constants.COMPUTER_OBJ, pc);
-            intent.putExtra(Constants.PASSWORD_ID, getIntent().getStringExtra(Constants.PASSWORD_ID));
-            startActivity(intent);
-        } else {
-            toast("Connection Failed. Try again.");
         }
     }
 
