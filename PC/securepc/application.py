@@ -1,7 +1,9 @@
 import io
 import os
+import sys
 import yaml
 import logging
+import threading
 
 from typing import List
 
@@ -40,6 +42,8 @@ class _Application(object):
 
         self.communication = BluetoothCommunication()
         pub.subscribe(self.mainloop, 'app_start')
+
+        self.clean_up_lock = threading.Lock()
 
         global _instance
         _instance = self # FIXME improve this singleton
@@ -229,13 +233,17 @@ class _Application(object):
                 try:
                     nonce = int.from_bytes(self.communication.receive(), 'big')
                 except TimeoutException:
-                    async_publish('disconnected')
-                    self.encrypt_all()
-                    async_publish('encrypted')
+                    self.clean_up()
                     break
                 if nonce in nonces:
                     async_publish('bad_nonce')
                     self.exit()
+
+    def clean_up(self):
+        with self.clean_up_lock:
+            async_publish('disconnected')
+            self.encrypt_all()
+            async_publish('encrypted')
 
     def encrypt_all(self):
         encrypt_all(self.files, self.decrypted_file_key)
@@ -247,6 +255,8 @@ class _Application(object):
 
     def exit(self):
         self.running = False
+        self.clean_up()
+        sys.exit(1)
 
 
 def get_instance():
