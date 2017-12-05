@@ -52,11 +52,11 @@ class MainUI(object):
         :param path: path to the image file
         """
         if sys.platform in ('linux', 'linux2'):
-            subprocess.call(['xdg-open', path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.Popen(['xdg-open', path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         elif sys.platform == 'darwin':
-            subprocess.call(['open', path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.Popen(['open', path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         elif sys.platform == 'win32':
-            subprocess.call(['powershell', '-c', path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.Popen(['powershell', '-c', path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     def welcome(self):
         print("It seems this is your first time running this program.")
