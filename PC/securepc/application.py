@@ -106,7 +106,7 @@ class _Application(object):
         if self.local_cipher is None:
             raise NoPasswordError("No valid password has been inputted yet")
         if not os.path.isfile(constants.FILES_LIST_PATH):
-            self.files = {}
+            self.files = []
             return []
 
         with open(constants.FILES_LIST_PATH, 'rb') as f:
