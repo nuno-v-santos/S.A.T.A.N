@@ -159,7 +159,7 @@ class _Application(object):
         self.phone_public_key = RSAKeyManager().load_key(constants.PHONE_KEYS_PATH, self.password)
 
     def load_encrypted_file_key(self):
-        self.encrypted_file_key = AES256KeyManager().load_key(constants.ENCRYPTED_DISK_KEY_PATH, self.password)
+        self.encrypted_file_key = AES256KeyManager().load_key(constants.ENCRYPTED_FILE_KEY_PATH, self.password)
 
     def ensure_encryption(self) -> bool:
         """
@@ -167,10 +167,10 @@ class _Application(object):
 
         :return True if a crash was detected; False otherwise
         """
-        if os.path.exists(constants.DECRYPTED_DISK_KEY_NAME):
-            disk_key = AES256KeyManager().load_key(constants.DECRYPTED_DISK_KEY_PATH, self.password)
+        if os.path.exists(constants.DECRYPTED_FILE_KEY_NAME):
+            disk_key = AES256KeyManager().load_key(constants.DECRYPTED_FILE_KEY_PATH, self.password)
             encrypt_all(self.files, disk_key)
-            os.remove(constants.DECRYPTED_DISK_KEY_PATH)
+            os.remove(constants.DECRYPTED_FILE_KEY_PATH)
             return True
         return False
 
@@ -194,7 +194,7 @@ class _Application(object):
 
         logging.debug("Receiving and decrypting Disk Encryption Key (encrypted by Master Encryption Key)")
         disk_key_mek = self.communication.receive(80) # receive IV | DEK(MEK)[TEK]
-        AES256KeyManager().store_key(disk_key_mek, constants.ENCRYPTED_DISK_KEY_PATH)
+        AES256KeyManager().store_key(disk_key_mek, constants.ENCRYPTED_FILE_KEY_PATH)
         logging.debug("Disk Encryption Key (MEK) is {}".format(disk_key_mek.hex()))
 
         logging.debug("Pairing complete.")
@@ -247,7 +247,7 @@ class _Application(object):
 
     def encrypt_all(self):
         encrypt_all(self.files, self.file_encryption_key)
-        os.remove(constants.DECRYPTED_DISK_KEY_PATH)
+        os.remove(constants.DECRYPTED_FILE_KEY_PATH)
         self.decrypted_file_key = None
 
     def decrypt_all(self):
