@@ -6,7 +6,7 @@ from typing import List
 from pubsub import pub
 
 
-_COMMANDS = ['add', 'remove']
+_COMMANDS = ['add', 'remove', 'status', 'exit']
 _RE_SPACE = re.compile('.*\s+$', re.M)
 
 class _Completer(object):
