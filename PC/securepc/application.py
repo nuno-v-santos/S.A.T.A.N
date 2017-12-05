@@ -197,13 +197,13 @@ class _Application(object):
         if os.path.exists(file) and not file in self.files:
             self.files.append(file)
             self.save_files_list()
-            async_publish("file_list_changed", list(self.files))
+            async_publish("file_list_changed", filelist=list(self.files))
 
     def remove_file(self, file: str):
         index = self.files.index(file)
         if index != -1:
             del self.files[index]
-            async_publish("file_list_changed", list(self.files))
+            async_publish("file_list_changed", filelist=list(self.files))
 
     def mainloop(self):
         self.load_phone_key()
