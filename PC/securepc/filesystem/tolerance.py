@@ -40,8 +40,6 @@ def ensure_log_exists(f):
 @synchronized(mutex)
 @ensure_log_exists
 def log_encryption_start(path: str):
-        path=path,
-    ))
     with open(LOG_PATH, 'a') as log_file:
         print("es:{path}".format(
             path=path.encode('utf-8').hex(),
