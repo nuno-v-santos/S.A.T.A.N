@@ -80,7 +80,7 @@ def get_file_status() -> Dict[str, str]:
     logged files
     :return: a dictionary mapping file paths to encryption status (encrypting, encrypted, decrypting, decrypted)
     """
-    file_status: Dict[str, str] = {}
+    file_status = {}
     if not os.path.exists(LOG_PATH):
         return {}
     with open(LOG_PATH, 'r') as log_file:
