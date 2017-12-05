@@ -60,10 +60,7 @@ class _Completer(object):
 
     def complete_remove(self, args):
         "Completions for the 'remove' command."
-        if not args:
-            return self._file_list
-        results = [p for p in self._file_list if p.startswith(args[-1])]
-        return results
+        return self.complete_add(args)
 
     def complete(self, text, state):
         """
