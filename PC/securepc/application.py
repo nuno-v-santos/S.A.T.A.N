@@ -199,6 +199,7 @@ class _Application(object):
         :param file: path to file to add
         :return: True if file was added; False otherwise
         """
+        file = os.path.realpath(file)
         if os.path.exists(file) and not file in self.files:
             self.files.append(file)
             self.save_files_list()
@@ -213,6 +214,7 @@ class _Application(object):
         :param file: path to file to remove
         :return: True if file was removed; False otherwise
         """
+        file = os.path.realpath(file)
         try:
             index = self.files.index(file)
         except ValueError:
