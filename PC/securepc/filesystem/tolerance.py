@@ -105,4 +105,5 @@ def clear_log() -> None:
     """
     Delete the log file
     """
-    os.remove(LOG_PATH)
+    if os.path.isfile(LOG_PATH):
+        os.remove(LOG_PATH)
