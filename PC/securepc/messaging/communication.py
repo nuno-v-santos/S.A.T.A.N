@@ -30,7 +30,10 @@ class BluetoothCommunication(CommunicationInterface):
                                     profiles=[bluetooth.SERIAL_PORT_PROFILE]
                                     )
         self.logger.debug("Waiting for connection on RFCOMM port {}".format(self.port))
-        self.socket, self.client_info = self.server_socket.accept()
+        try:
+            self.socket, self.client_info = self.server_socket.accept()
+        except bluetooth.BluetoothError:
+            raise TimeoutException
         self.logger.debug("Accepted connection from {}".format(self.client_info))
         self.name, self.address = self.client_info
 
