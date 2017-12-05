@@ -246,9 +246,10 @@ class _Application(object):
             async_publish('encrypted')
 
     def encrypt_all(self):
-        encrypt_all(self.files, self.decrypted_file_key)
-        os.remove(constants.DECRYPTED_FILE_KEY_PATH)
-        self.decrypted_file_key = None
+        if self.decrypted_file_key is not None:
+            encrypt_all(self.files, self.decrypted_file_key)
+            os.remove(constants.DECRYPTED_FILE_KEY_PATH)
+            self.decrypted_file_key = None
 
     def decrypt_all(self):
         decrypt_all(self.files, self.decrypted_file_key)
