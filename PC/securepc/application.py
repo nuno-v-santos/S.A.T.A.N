@@ -218,6 +218,7 @@ class _Application(object):
         except ValueError:
             return False
         del self.files[index]
+        self.save_files_list()
         async_publish("file_list_changed", file_list=list(self.files))
         return True
 
