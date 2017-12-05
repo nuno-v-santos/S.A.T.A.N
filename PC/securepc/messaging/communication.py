@@ -163,6 +163,8 @@ class SecureCommunication(CommunicationInterface):
 
     def receive(self, size: int = 1024) -> bytes:
         msg = self.communication.receive(size)
+        if (len(msg) <= 32): # Message should contain IV + msg + MAC;
+            raise TimeoutException
         decrypted = self.symmetric_cipher.decrypt(msg)
         return decrypted
 
