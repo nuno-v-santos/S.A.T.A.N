@@ -18,9 +18,12 @@ class CommunicationInterface(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def accept(self) -> None:
+    def accept(self, timeout: int = 0) -> None:
         """
         Wait for a peer to connect.
+
+        :param timeout: timeout to wait for (0 is infinite)
+        :throw: TimeoutException if timeout is exceeded
         """
         raise NotImplementedError
 

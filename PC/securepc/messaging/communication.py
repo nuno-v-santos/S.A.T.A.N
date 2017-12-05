@@ -15,13 +15,15 @@ class BluetoothCommunication(CommunicationInterface):
         self.address = ''
         self.server_socket = None
 
-    def accept(self):
+    def accept(self, timeout: int = 0):
         self.close()
         self.server_socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         self.server_socket.bind(("", bluetooth.PORT_ANY))
         self.server_socket.listen(1)
         self.port = self.server_socket.getsockname()[1]
 
+        if timeout:
+            self.server_socket.settimeout(timeout)
         bluetooth.advertise_service(self.server_socket, "SecurePC",
                                     service_id=uuid,
                                     service_classes=[uuid, bluetooth.SERIAL_PORT_CLASS],
@@ -159,13 +161,13 @@ class SecureCommunication(CommunicationInterface):
         self.communication.connect(address)
         self._exchange_keys()
 
-    def accept(self) -> None:
+    def accept(self, timeout: int = 0) -> None:
         """
         Wait until a peer connects; then, exchange
         a session key
         """
         self.close()
-        self.communication.accept()
+        self.communication.accept(timeout)
         self._exchange_keys()
 
     def send(self, msg: bytes) -> int:

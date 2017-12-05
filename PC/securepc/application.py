@@ -220,7 +220,10 @@ class _Application(object):
         )
 
         while self.running:
-            self.communication.accept()
+            try:
+                self.communication.accept(5)
+            except TimeoutException:
+                continue
             async_publish('connected')
             self.communication.send(self.encrypted_file_key)
             self.decrypted_file_key = self.communication.receive(64)
@@ -257,7 +260,6 @@ class _Application(object):
     def exit(self):
         self.running = False
         self.clean_up()
-        sys.exit(1)
 
 
 def get_instance():
