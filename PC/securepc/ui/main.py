@@ -7,7 +7,11 @@ from getpass import getpass
 
 from securepc import application
 from securepc.util import async_publish
-from securepc.ui.completion import init_completion
+try:
+    from securepc.ui.completion import init_completion
+except ImportError: # Windows does not have the readline library, there will be no completion
+    def init_completion():
+        pass
 from securepc.constants import APP_NAME
 from securepc.security.keys import RSAKeyManager
 from securepc.constants import CONFIG_DIRECTORY
