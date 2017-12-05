@@ -165,5 +165,6 @@ to learn more.
 
 ![Communication diagram on the proposed solution\label{sol_diagram}](Solution_Diagram.png){ height=100% }
 
-![Project Class Diagram\label{uml}](Solution_Diagram.png){ height=100% }
+![Project Class Diagram -- The application then had a UI Module and an
+  Application singleton that invoked the methods on these objects\label{uml}](SIRS_Packages.png){ height=100% }
 
