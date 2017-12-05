@@ -181,6 +181,7 @@ class MainUI(object):
 
     def exit(self):
         self.running = False
+        print("Exiting, please wait...")
         self.app.exit()
 
     def remove_files(self, args):
