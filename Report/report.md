@@ -14,7 +14,9 @@ fontsize: 11
 
 # Problem
 
-After pairing the phone with the computer, keys are generated and certain files on the computer can be encrypted when the phone is not connected to it. A phone is connected when near to the computer through the exchange of a token.
+After pairing the phone with the computer, keys are generated and certain files on the computer 
+can be encrypted when the phone is not connected to it. A phone is connected when near to the 
+computer through the exchange of a token.
 
 We need to ensure that:
 
