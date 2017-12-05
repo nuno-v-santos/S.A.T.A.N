@@ -121,6 +121,7 @@ class MainUI(object):
         Process the user's input and redirect it to the application
         """
         print("Welcome to {}.".format(APP_NAME))
+        self.print_instructions()
         while self.running:
             line = input().split()
             if not line:
@@ -143,6 +144,7 @@ class MainUI(object):
                 self.exit()
             else:
                 print("Invalid command.")
+                self.print_instructions()
 
     def exit(self):
         self.running = False
