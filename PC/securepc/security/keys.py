@@ -1,5 +1,3 @@
-import logging
-
 from Cryptodome.Protocol.KDF import PBKDF2
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Random import get_random_bytes
@@ -14,17 +12,12 @@ RSAKey = RSA.RsaKey
 AESKey = bytes
 
 class RSAKeyManager(AsymmetricKeyManagementInterface):
-    def __init__(self):
-        self.logger = logging.getLogger('RSAKeyManager')
-
     def create_key_pair(self, size: int) -> KeyPair:
-        self.logger.debug('Generating key of size {}'.format(size))
         private_key = RSA.generate(size)
         public_key = private_key.publickey()
         return KeyPair(private_key=private_key, public_key=public_key)
 
     def load_key(self, file: Union[str, IO[AnyStr]], password: str = None) -> Key:
-        self.logger.debug('Loading key')
         if isinstance(file, str):
             with open(file, 'rb') as f:
                 pem = f.read()
@@ -34,7 +27,6 @@ class RSAKeyManager(AsymmetricKeyManagementInterface):
         return key
 
     def store_key(self, key: Key, file: Union[str, IO[AnyStr]], password: str = None) -> None:
-        self.logger.debug('Saving key')
         assert isinstance(key, RSA.RsaKey), 'Wrong key type'
         if isinstance(file, str):
             with open(file, 'wb') as f:

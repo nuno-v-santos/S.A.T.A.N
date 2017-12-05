@@ -1,4 +1,3 @@
-import logging
 import qrcode
 import sys
 import io
@@ -61,7 +60,6 @@ class MainUI(object):
         print("Is this correct? If not, please terminate the application and try again.")
         print("Otherwise, press Return.")
         input("")
-        logging.debug("Creating QR Code with public key")
 
         with io.BytesIO() as f:
             RSAKeyManager().store_key(self.app.public_key, f)

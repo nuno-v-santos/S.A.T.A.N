@@ -2,7 +2,6 @@ import io
 import os
 import sys
 import yaml
-import logging
 import threading
 
 from typing import List
@@ -116,9 +115,6 @@ class _Application(object):
         with io.StringIO(str(decrypted_files_list, 'utf-8')) as s:
             files_list = yaml.load(s)
 
-        logger = logging.getLogger("model")
-        logger.debug("Loaded files list is {}".format(files_list))
-
         self.files = files_list
         return files_list
 
@@ -150,7 +146,6 @@ class _Application(object):
         Generate and store a new RSA key pair
         :return: the generated public key
         """
-        logging.debug("Generating asymmetric keys")
         rsa_key_manager = RSAKeyManager()
         self.computer_key_pair = rsa_key_manager.create_key_pair(2048)
         rsa_key_manager.store_key_pair(self.computer_key_pair, constants.PC_KEYS_PATH, self.password)

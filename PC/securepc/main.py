@@ -1,4 +1,3 @@
-import logging
 from securepc.ui.main import MainUI
 
 def main():

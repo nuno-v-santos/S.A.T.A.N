@@ -1,13 +1,11 @@
 import os
 import shutil
-import logging
 from typing import List
 
 from securepc.filesystem.tolerance import *
 from securepc.filesystem.constants import BACKUP_DIR
 from securepc.security.encryption import AES256Encryption, Key
 
-_logger = logging.getLogger('file_encryption')
 
 def encrypt_file(path: str, key: Key) -> None:
     """
@@ -78,7 +76,6 @@ def encrypt_all(files: List[str], key: Key) -> None:
                 os.remove(backup)  # We don't want to have a backup we don't need
             continue
         if status in ('encrypting', 'decrypting') and os.path.isfile(backup):
-            _logger.debug('Restoring {} from backup'.format(path))
             shutil.copy2(backup, path)
             if status == 'encrypting':
                 status = 'decrypted' # in this case, the restored backup will be decrypted

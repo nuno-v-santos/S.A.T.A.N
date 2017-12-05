@@ -1,11 +1,9 @@
 import os
-import logging
 import threading
 from securepc.filesystem.constants import LOG_PATH, LOG_DIR
 from typing import Dict, NamedTuple
 
 
-_logger = logging.getLogger('tolerance')
 mutex = threading.Lock()
 
 def synchronized(lock: threading.Lock):
@@ -42,7 +40,6 @@ def ensure_log_exists(f):
 @synchronized(mutex)
 @ensure_log_exists
 def log_encryption_start(path: str):
-    _logger.debug('Encrypting {path}'.format(
         path=path,
     ))
     with open(LOG_PATH, 'a') as log_file:
@@ -54,7 +51,6 @@ def log_encryption_start(path: str):
 @synchronized(mutex)
 @ensure_log_exists
 def log_encryption_end(path: str):
-    _logger.debug('Finished encrypting {}'.format(path))
     with open(LOG_PATH, 'a') as log_file:
         print("ee:{path}".format(
             path=path.encode('utf-8').hex(),
@@ -64,7 +60,6 @@ def log_encryption_end(path: str):
 @synchronized(mutex)
 @ensure_log_exists
 def log_decryption_start(path: str):
-    _logger.debug('Decrypting {}'.format(path))
     with open(LOG_PATH, 'a') as log_file:
         print("ds:{path}".format(
             path=path.encode('utf-8').hex(),
@@ -74,7 +69,6 @@ def log_decryption_start(path: str):
 @synchronized(mutex)
 @ensure_log_exists
 def log_decryption_end(path: str):
-    _logger.debug('Finished decrypting {}'.format(path))
     with open(LOG_PATH, 'a') as log_file:
         print("de:{path}".format(
             path=path.encode('utf-8').hex(),
@@ -87,7 +81,6 @@ def get_file_status() -> Dict[str, str]:
     logged files
     :return: a dictionary mapping file paths to encryption status (encrypting, encrypted, decrypting, decrypted)
     """
-    _logger.debug('Fetching all currently decrypted files from the log')
     file_status: Dict[str, str] = {}
     if not os.path.exists(LOG_PATH):
         return {}
@@ -100,16 +93,12 @@ def get_file_status() -> Dict[str, str]:
             except:
                 continue # some error happened writing this line to the log, ignore it
             if opcode == 'ds':
-                logging.debug("Found decryption-in-progress file at {}".format(path))
                 file_status[path] = 'decrypting'
             elif opcode == 'de':
-                logging.debug("File at {} was decrypted")
                 file_status[path] = 'decrypted'
             elif opcode == 'es':
-                logging.debug("Found encryption-in-progress file at {}".format(path))
                 file_status[path] = 'encrypting'
             elif opcode == 'ee':
-                logging.debug("File at {} was encrypted".format(path))
                 file_status[path] = 'encrypted'
     return file_status
 
