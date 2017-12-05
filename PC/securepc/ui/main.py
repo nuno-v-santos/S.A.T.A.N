@@ -72,6 +72,7 @@ class MainUI(object):
 
         print("When you press Return, a QR Code will be displayed on your screen.")
         print("Please scan it with your phone, then close the image.")
+        input("")
         qr.show()
         self.app.initial_exchange()
         print("Phone has been successfully paired.")
