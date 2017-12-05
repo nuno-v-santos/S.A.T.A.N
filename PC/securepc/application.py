@@ -51,7 +51,7 @@ class _Application(object):
         return self.computer_key_pair.public_key
 
     def has_paired(self):
-        return all(os.path.exists(path) for path in constants.CONFIG_FILES)
+        return all(os.path.isfile(path) for path in constants.CONFIG_FILES)
 
     def define_password(self, password: str) -> None:
         """
