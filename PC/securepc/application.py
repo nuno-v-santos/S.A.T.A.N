@@ -158,6 +158,9 @@ class _Application(object):
     def load_phone_key(self):
         self.phone_public_key = RSAKeyManager().load_key(constants.PHONE_KEYS_PATH, self.password)
 
+    def load_encrypted_file_key(self):
+        self.encrypted_file_key = AES256KeyManager().load_key(constants.ENCRYPTED_DISK_KEY_PATH, self.password)
+
     def ensure_encryption(self) -> bool:
         """
         Makes sure no files are left encrypted from a crashed session.
@@ -212,6 +215,7 @@ class _Application(object):
 
     def mainloop(self):
         self.load_phone_key()
+        self.load_encrypted_file_key()
 
         self.communication = SecureCommunication(
             BluetoothCommunication(),
