@@ -8,8 +8,8 @@ PASSWORD_CHECK_NAME = 'password_check'
 FILES_LIST_NAME = 'files.yml'
 PC_KEYS_NAME = 'rsa_key_pc.bin'
 PHONE_KEYS_NAME = 'rsa_key_phone.bin'
-ENCRYPTED_FILE_KEY_NAME = 'enc_disk_key.bin'
-DECRYPTED_FILE_KEY_NAME = 'dec_disk_key.bin'
+ENCRYPTED_FILE_KEY_NAME = 'enc_file_key.bin'
+DECRYPTED_FILE_KEY_NAME = 'dec_file_key.bin'
 
 
 CONFIG_DIRECTORY = appdirs.user_config_dir(APP_NAME)
