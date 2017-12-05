@@ -194,7 +194,7 @@ class _Application(object):
 
         logging.debug("Receiving and decrypting Disk Encryption Key (encrypted by Master Encryption Key)")
         disk_key_mek = self.communication.receive(80) # receive IV | DEK(MEK)[TEK]
-        AES256KeyManager().store_key(disk_key_mek, constants.ENCRYPTED_FILE_KEY_PATH)
+        AES256KeyManager().store_key(disk_key_mek, constants.ENCRYPTED_FILE_KEY_PATH, self.password)
         logging.debug("Disk Encryption Key (MEK) is {}".format(disk_key_mek.hex()))
 
         logging.debug("Pairing complete.")
