@@ -52,7 +52,7 @@ public class KeyManagement implements KeyManagementInterface {
     @Override
     public Key loadKey(Context context, String id, String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
         SecurePreferences preferences =
-                new SecurePreferences(context, Constants.PREFERENCES, password, true);
+                new SecurePreferences(context, Constants.PREFERENCES, password, false);
         String base64Key = preferences.getString(id);
 
         String[] lines = base64Key.split("\\r?\\n");
@@ -87,7 +87,7 @@ public class KeyManagement implements KeyManagementInterface {
     @Override
     public void storeKey(Context context, Key key, String id, String password) {
         SecurePreferences preferences =
-                new SecurePreferences(context, Constants.PREFERENCES, password, true);
+                new SecurePreferences(context, Constants.PREFERENCES, password, false);
 
         String begin;
 
@@ -131,7 +131,7 @@ public class KeyManagement implements KeyManagementInterface {
     @Override
     public byte[] loadIV(Context context, String id, String password) {
         SecurePreferences preferences =
-                new SecurePreferences(context, Constants.PREFERENCES, password, true);
+                new SecurePreferences(context, Constants.PREFERENCES, password, false);
         String base64IV = preferences.getString(id);
         byte[] iv = Base64.decode(base64IV, Base64.DEFAULT);
         return iv;
@@ -140,7 +140,7 @@ public class KeyManagement implements KeyManagementInterface {
     @Override
     public void storeIV(Context context, byte[] iv, String id, String password) {
         SecurePreferences preferences =
-                new SecurePreferences(context, Constants.PREFERENCES, password, true);
+                new SecurePreferences(context, Constants.PREFERENCES, password, false);
         String base64IV = Base64.encodeToString(iv, Base64.DEFAULT);
         preferences.put(Constants.ANDROID_MEK_IV_ID, base64IV);
     }
