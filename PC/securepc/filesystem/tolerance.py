@@ -1,4 +1,5 @@
 import os
+import binascii
 import threading
 from securepc.filesystem.constants import LOG_PATH, LOG_DIR
 from typing import Dict, NamedTuple
@@ -42,7 +43,7 @@ def ensure_log_exists(f):
 def log_encryption_start(path: str):
     with open(LOG_PATH, 'a') as log_file:
         print("es:{path}".format(
-            path=path.encode('utf-8').hex(),
+            path=binascii.hexlify(path.encode('utf-8')),
         ), file=log_file)
 
 
@@ -51,7 +52,7 @@ def log_encryption_start(path: str):
 def log_encryption_end(path: str):
     with open(LOG_PATH, 'a') as log_file:
         print("ee:{path}".format(
-            path=path.encode('utf-8').hex(),
+            path=binascii.hexlify(path.encode('utf-8')),
         ), file=log_file)
 
 
@@ -60,7 +61,7 @@ def log_encryption_end(path: str):
 def log_decryption_start(path: str):
     with open(LOG_PATH, 'a') as log_file:
         print("ds:{path}".format(
-            path=path.encode('utf-8').hex(),
+            path=binascii.hexlify(path.encode('utf-8')),
         ), file=log_file)
 
 
@@ -69,7 +70,7 @@ def log_decryption_start(path: str):
 def log_decryption_end(path: str):
     with open(LOG_PATH, 'a') as log_file:
         print("de:{path}".format(
-            path=path.encode('utf-8').hex(),
+            path=binascii.hexlify(path.encode('utf-8')),
         ), file=log_file)
 
 @synchronized(mutex)
