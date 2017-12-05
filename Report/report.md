@@ -51,7 +51,8 @@ sends it encrypted with the PC’s public key. Afterwards, using that key for en
 it sends its own public key, which is stored by the PC to be used as a Key Encryption Key.
 This serves as a protection from man-in-the-middle attacks.
 
-The phone generates two other AES-256 keys, one to be used for file encryption, and one to encrypt that key before sending it to the PC.
+The phone generates two other AES-256 keys, one to be used for file encryption, and one to encrypt 
+that key before sending it to the PC.
 This key is stored, and the pairing process is completed.
 
 After pairing, the phone can connect to the PC, who (after the initial session key exchange) sends the
