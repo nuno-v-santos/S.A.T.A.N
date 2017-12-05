@@ -141,7 +141,7 @@ class MainUI(object):
                 if self.connected:
                     self.remove_files(args)
                 else:
-                    print("Warning: not connected. Removing this file would leave it encrypted. Ignoring...")
+                    print("Warning: not connected. Removing a file would leave it encrypted. Ignoring...")
             elif cmd == 'status':
                 self.print_status()
             elif cmd == 'exit':
