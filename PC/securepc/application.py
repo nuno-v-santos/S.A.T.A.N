@@ -166,7 +166,7 @@ class _Application(object):
 
         :return True if a crash was detected; False otherwise
         """
-        if os.path.exists(constants.DECRYPTED_FILE_KEY_NAME):
+        if os.path.exists(constants.DECRYPTED_FILE_KEY_PATH):
             disk_key = AES256KeyManager().load_key(constants.DECRYPTED_FILE_KEY_PATH, self.password)
             encrypt_all(self.files, disk_key)
             os.remove(constants.DECRYPTED_FILE_KEY_PATH)
