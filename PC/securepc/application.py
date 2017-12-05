@@ -175,29 +175,21 @@ class _Application(object):
         return False
 
     def initial_exchange(self):
-        logging.debug("Receiving and decrypting session key")
         session_key = self.communication.receive(self.computer_key_pair.public_key.size_in_bytes()) # Receive TEK
-        logging.debug("Decrypting session key")
         rsa_private_cipher = RSAEncryption(self.computer_key_pair.private_key)
         session_key = rsa_private_cipher.decrypt(session_key)
 
         self.communication = SecureCommunication(self.communication, self.computer_key_pair.public_key)
         self.communication.symmetric_key = session_key
 
-        logging.debug("Receiving and decrypting phone's public key")
         phone_key = self.communication.receive(481) # Receive IV | phone_public[TEK]
-        logging.debug("Phone key is {}".format(phone_key))
         with io.BytesIO(phone_key) as f:
             self.phone_public_key = RSAKeyManager().load_key(f)
 
         self.store_phone_key()
 
-        logging.debug("Receiving and decrypting Disk Encryption Key (encrypted by Master Encryption Key)")
         disk_key_mek = self.communication.receive(80) # receive IV | DEK(MEK)[TEK]
         AES256KeyManager().store_key(disk_key_mek, constants.ENCRYPTED_FILE_KEY_PATH, self.password)
-        logging.debug("Disk Encryption Key (MEK) is {}".format(disk_key_mek.hex()))
-
-        logging.debug("Pairing complete.")
 
         self.communication.close()
 
