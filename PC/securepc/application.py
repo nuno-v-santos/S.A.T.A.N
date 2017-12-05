@@ -36,7 +36,7 @@ class _Application(object):
         self.phone_public_key = None
         self.computer_key_pair = None
         self.encrypted_file_key = None
-        self.file_encryption_key = None
+        self.decrypted_file_key = None
 
         self.communication = BluetoothCommunication()
         pub.subscribe(self.mainloop, 'app_start')
@@ -246,12 +246,12 @@ class _Application(object):
                     self.exit()
 
     def encrypt_all(self):
-        encrypt_all(self.files, self.file_encryption_key)
+        encrypt_all(self.files, self.decrypted_file_key)
         os.remove(constants.DECRYPTED_FILE_KEY_PATH)
         self.decrypted_file_key = None
 
     def decrypt_all(self):
-        decrypt_all(self.files, self.file_encryption_key)
+        decrypt_all(self.files, self.decrypted_file_key)
 
     def exit(self):
         self.running = False
