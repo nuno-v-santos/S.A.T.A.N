@@ -1,5 +1,7 @@
+import tempfile
 import qrcode
 import sys
+import os
 import io
 
 from pubsub import pub
@@ -42,6 +44,19 @@ class MainUI(object):
         async_publish('app_start')
         self.repl()
 
+    def show_image(self, path: str):
+        """
+        Show an image using the default image viewer.
+
+        :param path: path to the image file
+        """
+        if sys.platform in ('linux', 'linux2'):
+            os.system('xdg-open "{}"'.format(path))
+        elif sys.platform == 'darwin':
+            os.system('open "{}"'.format(path))
+        elif sys.platform == 'win32':
+            os.system('powershell -c "{}"'.format(path))
+
     def welcome(self):
         print("It seems this is your first time running this program.")
         print("Welcome! First, you will need to set a password.")
@@ -71,12 +86,19 @@ class MainUI(object):
         with io.BytesIO() as f:
             RSAKeyManager().store_key(self.app.public_key, f)
             public_key = f.getvalue()
-        qr = qrcode.make(public_key)
 
         print("When you press Return, a QR Code will be displayed on your screen.")
         print("Please scan it with your phone, then close the image.")
         input("")
-        qr.show()
+
+        qr = qrcode.make(public_key)
+        qr.format = 'PNG'
+        qr_fd, qr_path = tempfile.mkstemp('.png')
+        os.close(qr_fd)
+        with open(qr_path, 'wb') as f:
+            qr.save(f)
+        self.show_image(qr_path)
+
         self.app.initial_exchange()
         print("Phone has been successfully paired.")
         print("Your configuration files are located in {}.".format(CONFIG_DIRECTORY))
