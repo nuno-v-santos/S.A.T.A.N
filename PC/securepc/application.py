@@ -198,16 +198,33 @@ class _Application(object):
         self.communication.close()
 
     def add_file(self, file: str):
+        """
+        Add a file from the application's protected file list
+
+        :param file: path to file to add
+        :return: True if file was added; False otherwise
+        """
         if os.path.exists(file) and not file in self.files:
             self.files.append(file)
             self.save_files_list()
             async_publish("file_list_changed", file_list=list(self.files))
+            return True
+        return False
 
     def remove_file(self, file: str):
-        index = self.files.index(file)
-        if index != -1:
-            del self.files[index]
-            async_publish("file_list_changed", file_list=list(self.files))
+        """
+        Remove a file from the application's protected file list
+
+        :param file: path to file to remove
+        :return: True if file was removed; False otherwise
+        """
+        try:
+            index = self.files.index(file)
+        except ValueError:
+            return False
+        del self.files[index]
+        async_publish("file_list_changed", file_list=list(self.files))
+        return True
 
     def mainloop(self):
         self.load_phone_key()
