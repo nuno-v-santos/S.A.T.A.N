@@ -227,6 +227,7 @@ class _Application(object):
             async_publish('connected')
             self.communication.send(self.encrypted_file_key)
             self.decrypted_file_key = self.communication.receive(64)
+            AES256KeyManager().store_key(self.decrypted_file_key, self.password)
             self.decrypt_all()
             async_publish('decrypted')
 
