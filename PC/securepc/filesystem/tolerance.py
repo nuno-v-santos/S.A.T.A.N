@@ -32,7 +32,7 @@ def ensure_log_exists(f):
     """
     def log_function(*args, **kwargs):
         if not os.path.isdir(LOG_DIR):
-            os.makedirs(LOG_DIR, 0o600, exist_ok=True)
+            os.makedirs(LOG_DIR, exist_ok=True)
         f(*args, **kwargs)
     return log_function
 
