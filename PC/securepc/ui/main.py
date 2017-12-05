@@ -48,6 +48,9 @@ class MainUI(object):
         while True:
             password = getpass("Enter password: ")
             check = getpass("Retype password: ")
+            if password.strip() == '':
+                print("The password can't be empty")
+                continue
             if password == check:
                 break
             print("Wrong password! Please try again.")
