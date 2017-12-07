@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SSAndroidApp</string>
+    <string name="app_name">SATAN</string>
     <string name="qr_code_read_success_msg">QR successfully read!</string>
     <string name="ClassNotFoundException_error_msg">Error: Unable to retrieve current paired device.</string>
     <string name="current_paired_computer_name_msg">Currently connected to: </string>
