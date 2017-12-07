@@ -191,11 +191,17 @@ class MainUI(object):
 
     def remove_files(self, args):
         for path in args:
-            self.app.remove_file(path)
+            if self.app.remove_file(path):
+                print("{} removed.".format(path))
+            else:
+                print("{} could not be removed.".format(path))
 
     def add_files(self, paths):
         for path in paths:
-            self.app.add_file(path)
+            if self.app.add_file(path):
+                print("{} added.".format(path))
+            else:
+                print("{} could not be added.".format(path))
 
     def print_status(self):
         print("Connection: {}".format("Connected" if self.connected else "Not connected"))
