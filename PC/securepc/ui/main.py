@@ -76,20 +76,14 @@ class MainUI(object):
         print('Press "Pairing" on your phone, then select your computer from the list.')
         print("Waiting for pairing process to complete...")
         self.app.accept_connection()
-        print("I've accepted a connection from {name} @ {address}.".format(
-            name=self.app.phone_name,
-            address=self.app.phone_address
-        ))
-        print("Is this correct? If not, please terminate the application and try again.")
-        print("Otherwise, press Return.")
-        input("")
 
         with io.BytesIO() as f:
             RSAKeyManager().store_key(self.app.public_key, f)
             public_key = f.getvalue()
 
-        print("When you press Return, a QR Code will be displayed on your screen.")
+        print("A QR Code will be displayed on your screen.")
         print("Please scan it with your phone, then close the image.")
+        print("Press Return to display the QR")
         input("")
 
         qr = qrcode.make(public_key)
