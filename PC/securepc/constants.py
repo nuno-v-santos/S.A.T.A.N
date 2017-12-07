@@ -1,7 +1,8 @@
 import appdirs
 import os
 
-APP_NAME = 'securepc'
+APP_NAME = 'satan' # Smartphone As a Token Also Nonces
+APP_VERBOSE_NAME = 'S.A.T.A.N.: Smartphone As a Token. Also, Nonces!'
 
 
 PASSWORD_CHECK_NAME = 'password_check'

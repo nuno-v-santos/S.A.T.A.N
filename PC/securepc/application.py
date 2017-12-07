@@ -1,6 +1,6 @@
 import io
 import os
-import sys
+import shutil
 import yaml
 import threading
 
@@ -9,6 +9,7 @@ from typing import List
 from pubsub import pub
 
 from securepc import constants
+from securepc.filesystem.tolerance import clear_log
 
 from securepc.util import async_publish
 
@@ -31,6 +32,7 @@ class _Application(object):
         self.phone_name = ''
         self.phone_address = ''
         self.running = True
+        self._unpair = False
 
         self.local_cipher = None
 
@@ -255,7 +257,8 @@ class _Application(object):
                 try:
                     nonce = int.from_bytes(self.communication.receive(), 'big')
                 except TimeoutException:
-                    self.clean_up()
+                    if not self._unpair: # We don't really need to cleanup since we'll exit
+                        self.clean_up()
                     break
                 if nonce in nonces:
                     async_publish('bad_nonce')
@@ -276,9 +279,17 @@ class _Application(object):
     def decrypt_all(self):
         decrypt_all(self.files, self.decrypted_file_key)
 
+    def unpair(self):
+        self._unpair = True
+
     def exit(self):
         self.running = False
-        self.clean_up()
+        if self._unpair:
+            if os.path.isdir(constants.CONFIG_DIRECTORY):
+                shutil.rmtree(constants.CONFIG_DIRECTORY)
+            clear_log()
+        else:
+            self.clean_up()
 
 
 def get_instance():
