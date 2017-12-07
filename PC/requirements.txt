@@ -1,6 +1,5 @@
 qrcode>=5.3
 Pillow>=4.3.0
-wxpython>=4.0.0b2
 pybluez>=0.22
 pyyaml>=3.12
 pypubsub>=4.0.0
