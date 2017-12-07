@@ -2,7 +2,7 @@ from Cryptodome.Cipher import AES, PKCS1_OAEP
 from Cryptodome.Util.Padding import pad, unpad
 from Cryptodome.Hash import SHA256
 
-from securepc.security.interfaces import EncryptionInterface, Key
+from satan.security.interfaces import EncryptionInterface, Key
 
 
 class RSAEncryption(EncryptionInterface):

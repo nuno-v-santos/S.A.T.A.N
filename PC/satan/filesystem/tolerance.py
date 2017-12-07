@@ -1,7 +1,7 @@
 import os
 import binascii
 import threading
-from securepc.filesystem.constants import LOG_PATH, LOG_DIR
+from satan.filesystem.constants import LOG_PATH, LOG_DIR
 from typing import Dict, NamedTuple
 
 

@@ -8,20 +8,20 @@ from typing import List
 
 from pubsub import pub
 
-from securepc import constants
-from securepc.filesystem.tolerance import clear_log
+from satan import constants
+from satan.filesystem.tolerance import clear_log
 
-from securepc.util import async_publish
+from satan.util import async_publish
 
-from securepc.exceptions import NoPasswordError
+from satan.exceptions import NoPasswordError
 
-from securepc.security.encryption import AES256Encryption, RSAEncryption
-from securepc.security.keys import AES256KeyManager, RSAKeyManager
+from satan.security.encryption import AES256Encryption, RSAEncryption
+from satan.security.keys import AES256KeyManager, RSAKeyManager
 
-from securepc.messaging.communication import BluetoothCommunication, SecureCommunication
-from securepc.messaging.exceptions import TimeoutException
+from satan.messaging.communication import BluetoothCommunication, SecureCommunication
+from satan.messaging.exceptions import TimeoutException
 
-from securepc.filesystem.encryption import encrypt_all, decrypt_all
+from satan.filesystem.encryption import encrypt_all, decrypt_all
 
 _instance = None
 

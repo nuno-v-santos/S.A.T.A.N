@@ -8,16 +8,16 @@ import io
 from pubsub import pub
 from getpass import getpass
 
-from securepc import application
-from securepc.util import async_publish
+from satan import application
+from satan.util import async_publish
 try:
-    from securepc.ui.completion import init_completion
+    from satan.ui.completion import init_completion
 except ImportError: # Windows does not have the readline library, there will be no completion
     def init_completion():
         pass
-from securepc.constants import APP_NAME, APP_VERBOSE_NAME
-from securepc.security.keys import RSAKeyManager
-from securepc.constants import CONFIG_DIRECTORY
+from satan.constants import APP_NAME, APP_VERBOSE_NAME
+from satan.security.keys import RSAKeyManager
+from satan.constants import CONFIG_DIRECTORY
 
 
 class MainUI(object):

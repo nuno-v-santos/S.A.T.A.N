@@ -1,6 +1,6 @@
 import appdirs
 import os
-from securepc.constants import APP_NAME
+from satan.constants import APP_NAME
 
 LOG_NAME = 'secure_log.txt'
 

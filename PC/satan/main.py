@@ -1,4 +1,4 @@
-from securepc.ui.main import MainUI
+from satan.ui.main import MainUI
 
 def main():
     ui = MainUI()

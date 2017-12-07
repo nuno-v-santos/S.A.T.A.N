@@ -2,9 +2,9 @@ import os
 import shutil
 from typing import List
 
-from securepc.filesystem.tolerance import *
-from securepc.filesystem.constants import BACKUP_DIR
-from securepc.security.encryption import AES256Encryption, Key
+from satan.filesystem.tolerance import *
+from satan.filesystem.constants import BACKUP_DIR
+from satan.security.encryption import AES256Encryption, Key
 
 
 def encrypt_file(path: str, key: Key) -> None:

@@ -2,8 +2,8 @@ import os
 import tempfile
 import unittest
 
-from securepc.filesystem.encryption import encrypt_file, decrypt_file
-from securepc.security import keys
+from satan.filesystem.encryption import encrypt_file, decrypt_file
+from satan.security import keys
 
 
 class EncryptionTestCase(unittest.TestCase):

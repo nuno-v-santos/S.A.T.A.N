@@ -1,8 +1,8 @@
-from securepc.messaging.interface import CommunicationInterface
-from securepc.messaging.constants import uuid
-from securepc.messaging.exceptions import TimeoutException
-from securepc.security.keys import AES256KeyManager, RSAKey, AESKey
-from securepc.security.encryption import RSAEncryption, AES256Encryption
+from satan.messaging.interface import CommunicationInterface
+from satan.messaging.constants import uuid
+from satan.messaging.exceptions import TimeoutException
+from satan.security.keys import AES256KeyManager, RSAKey, AESKey
+from satan.security.encryption import RSAEncryption, AES256Encryption
 import bluetooth
 
 
