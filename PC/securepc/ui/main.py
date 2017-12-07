@@ -15,7 +15,7 @@ try:
 except ImportError: # Windows does not have the readline library, there will be no completion
     def init_completion():
         pass
-from securepc.constants import APP_NAME
+from securepc.constants import APP_NAME, APP_VERBOSE_NAME
 from securepc.security.keys import RSAKeyManager
 from securepc.constants import CONFIG_DIRECTORY
 
@@ -28,6 +28,7 @@ class MainUI(object):
         self.running = True
 
     def start(self):
+        print("Welcome to {}.".format(APP_VERBOSE_NAME))
         if not self.app.has_paired():
             self.welcome()
         else:
@@ -60,7 +61,7 @@ class MainUI(object):
 
     def welcome(self):
         print("It seems this is your first time running this program.")
-        print("Welcome! First, you will need to set a password.")
+        print("First, you will need to set a password.")
         while True:
             password = getpass("Enter password: ")
             check = getpass("Retype password: ")
@@ -94,6 +95,7 @@ class MainUI(object):
             qr.save(f)
         self.show_image(qr_path)
 
+        input("Press Return after you read the QR")
         self.app.initial_exchange()
         print("Phone has been successfully paired.")
         print("Your configuration files are located in {}.".format(CONFIG_DIRECTORY))
@@ -134,12 +136,14 @@ class MainUI(object):
             print("Files have been decrypted")
 
     def print_instructions(self):
-        print("Valid commands:".format(APP_NAME))
-        print("\tadd <file> - Adds a file to the list of encrypted files (only works when connected to the phone)")
-        print("\tremove <file> - Remove a file from the list of encrypted files " +
+        print("----------------------------------")
+        print("Valid commands:")
+        print("add <file> - Adds a file to the list of encrypted files (only works when connected to the phone)")
+        print("remove <file> - Remove a file from the list of encrypted files " +
               "(only works when connected to the phone)")
-        print("\tstatus - Print current status")
-        print("\texit - Exit the program")
+        print("status - Print current status")
+        print("exit - Exit the program")
+        print("----------------------------------")
 
     def repl(self):
         """
@@ -147,7 +151,6 @@ class MainUI(object):
 
         Process the user's input and redirect it to the application
         """
-        print("Welcome to {}.".format(APP_NAME))
         self.print_instructions()
         while self.running:
             line = input().split()
@@ -167,6 +170,14 @@ class MainUI(object):
                     print("Warning: not connected. Removing a file would leave it encrypted. Ignoring...")
             elif cmd == 'status':
                 self.print_status()
+            elif cmd == 'unpair':
+                if self.encrypted:
+                    print("Warning: unpairing right now would keep your files encrypted. Please" +
+                          " connect to your phone first")
+                    continue
+                print("Press done on your phone app")
+                self.app.unpair()
+                self.exit()
             elif cmd == 'exit':
                 self.exit()
             else:
